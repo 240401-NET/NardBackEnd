@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NardBackEnd")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05b126a8ba00a99412b249073889b191ce722690")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b615748b045081b47e74162221646731780e1dd8")]
 [assembly: System.Reflection.AssemblyProductAttribute("NardBackEnd")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NardBackEnd")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

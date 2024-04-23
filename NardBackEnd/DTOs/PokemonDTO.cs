@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace DTOs;
 
 class PokemonDto
@@ -14,5 +16,6 @@ public class PokemonTypeContainer
 
 public class PokemonType
 {
+    [Key]
     public string Name { get; set; }
 }

@@ -1,8 +1,9 @@
-
+using System.ComponentModel.DataAnnotations;
 
 namespace Models;
 
 public class Move{
+    [Key]
     public int MoveId { get; set; }
     public string Name { get; set; }
     public int Power { get; set; }
