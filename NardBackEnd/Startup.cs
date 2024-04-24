@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Data;
+using Service;
 using Microsoft.Extensions.Configuration;
+using Repository;
 
 public class Startup
 {
@@ -9,7 +11,7 @@ public class Startup
     {
         Configuration = configuration;
     }
-
+    
     public IConfiguration Configuration { get; }
     public void ConfigureServices(IServiceCollection services)
     {
@@ -17,6 +19,10 @@ public class Startup
         services.AddSwaggerGen();
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+        services.AddHttpClient<IPokeAPIService, PokeAPIService>();
+        services.AddHttpClient<IPokemonService, PokemonService>();
+        services.AddScoped<IPokemonRepository, PokemonRepository>();
+        
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

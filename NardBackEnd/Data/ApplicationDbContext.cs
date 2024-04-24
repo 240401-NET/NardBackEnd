@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Models;
-using DTOs;
 
 namespace Data;
 public class ApplicationDbContext : DbContext
@@ -16,8 +15,4 @@ public class ApplicationDbContext : DbContext
     public DbSet<Leaderboard> Leaderboards {get; set;}
     public DbSet<Track> Tracks {get; set;}
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Ignore<PokemonTypeContainer>();
-    }
 }

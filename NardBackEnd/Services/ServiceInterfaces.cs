@@ -1,19 +1,31 @@
 using Models;
+using System.Text.Json;
 
 namespace Service;
 
-public interface IBattleService{
+public interface IBattleService
+{
 
 }
 
-public interface IPokemonService{
+public interface IPokemonService
+{
+    //Task FetchAndStorePokemon();
+    Task MakePokemonDBTable();
+}
+
+public interface IAudioService
+{
 
 }
 
-public interface IAudioService{
+public interface IImageService
+{
 
 }
 
-public interface IImageService{
-
+public interface IPokeAPIService
+{
+    Task<IEnumerable<Pokemon>> GetGen1PokemonAsync();
+    Task<JsonDocument> GetPokemon(string pokemon);
 }
