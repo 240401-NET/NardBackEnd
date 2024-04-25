@@ -35,7 +35,7 @@ public class PokeAPIService:IPokeAPIService
 
     public async Task<JsonDocument> GetPokemon(string pokemon)
     {
-        string url  = $"{baseUrl}/pokemon/{pokemon}";
+        string url  = $"{baseUrl}pokemon/{pokemon}";
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
         var stream = await response.Content.ReadAsStreamAsync();

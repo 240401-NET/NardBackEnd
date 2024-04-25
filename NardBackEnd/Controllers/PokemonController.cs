@@ -3,6 +3,7 @@ using Models;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 [ApiController]
 [Route("[controller]")]
@@ -48,9 +49,9 @@ public class PokemonController : ControllerBase
     }
 
     [HttpPost("makepokemontable")]
-    public void MakePokemonDBTable()
+    public async Task<List<Pokemon>> MakePokemonDBTable()
     {
-        _pokeService.MakePokemonDBTable();
-        //return Ok(pokemonsDb);
+        List<Pokemon> pokemonsDb = await _pokeService.MakePokemonDBTable();
+        return pokemonsDb;
     }
 }
