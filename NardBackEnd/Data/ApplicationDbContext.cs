@@ -10,7 +10,7 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Pokemon> Pokemon { get; set; }
-    public DbSet<Move> Moves { get; set; }
+    public DbSet<Move> Move { get; set; }
     public DbSet<Battle> Battles { get; set; }
     public DbSet<Leaderboard> Leaderboards {get; set;}
     public DbSet<Track> Tracks {get; set;}

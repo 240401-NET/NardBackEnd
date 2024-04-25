@@ -15,23 +15,23 @@ public class PokeAPIService:IPokeAPIService
         _httpClient = httpClient;
     }
 
-    public async Task<IEnumerable<Pokemon>> GetGen1PokemonAsync()
-    {
-        var pokemons = new List<Pokemon>();
-        string url = $"{baseUrl}pokemon?limit=151";
+    // public async Task<IEnumerable<Pokemon>> GetGen1PokemonAsync()
+    // {
+    //     var pokemons = new List<Pokemon>();
+    //     string url = $"{baseUrl}pokemon?limit=151";
 
-        while(!string.IsNullOrEmpty(url))
-        {
-            var response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var jsonString = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<PokemonApiResponse>(jsonString);
+    //     while(!string.IsNullOrEmpty(url))
+    //     {
+    //         var response = await _httpClient.GetAsync(url);
+    //         response.EnsureSuccessStatusCode();
+    //         var jsonString = await response.Content.ReadAsStringAsync();
+    //         var apiResponse = JsonSerializer.Deserialize<PokemonApiResponse>(jsonString);
 
-            pokemons.AddRange(apiResponse.Results.Select(p => new Pokemon {Name = p.Name}));
-            url = apiResponse.Next;
-        }
-        return pokemons;
-    }
+    //         pokemons.AddRange(apiResponse.Results.Select(p => new Pokemon {Name = p.Name}));
+    //         url = apiResponse.Next;
+    //     }
+    //     return pokemons;
+    // }
 
     public async Task<JsonDocument> GetPokemon(string pokemon)
     {
@@ -45,6 +45,20 @@ public class PokeAPIService:IPokeAPIService
 
         
     }
+
+        public async Task<JsonDocument> GetMove(string moveId)
+    {
+        string url  = $"{baseUrl}move/{moveId}";
+        var response = await _httpClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        var stream = await response.Content.ReadAsStreamAsync();
+        var jsonDoc = await JsonDocument.ParseAsync(stream);
+        return jsonDoc;
+
+
+        
+    }
+
 
     private class PokemonApiResponse
     {

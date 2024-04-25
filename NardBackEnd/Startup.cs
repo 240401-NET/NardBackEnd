@@ -21,8 +21,9 @@ public class Startup
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         services.AddHttpClient<IPokeAPIService, PokeAPIService>();
         services.AddHttpClient<IPokemonService, PokemonService>();
+        services.AddHttpClient<IMoveService, MoveService>();
         services.AddScoped<IPokemonRepository, PokemonRepository>();
-        
+        services.AddScoped<IMoveRepository, MoveRepository>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

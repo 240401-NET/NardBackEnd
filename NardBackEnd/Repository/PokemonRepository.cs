@@ -3,6 +3,7 @@ using Data;
 using Data;
 using Service;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository;
 
@@ -22,7 +23,8 @@ public class PokemonRepository : IPokemonRepository
     {
         
         List<Pokemon> pokemons = new List<Pokemon>();
-        
+        //Truncate Table Pokemon
+        await _context.Database.ExecuteSqlRawAsync("Truncate Table Pokemon");
         //make a loop
         for (int i = 1;i<=151;i++)
             {
@@ -61,13 +63,15 @@ public class PokemonRepository : IPokemonRepository
                     // Console.WriteLine(moveList[i]);
                 }
             dbPokemon.MovePool = moveList;
+            dbPokemon.Sprite = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{i}.png";
             //post Pokemon to our DB
             _context.Pokemon.Add(dbPokemon);
             pokemons.Add(dbPokemon);
             //savechanges 
             
-            }
-            await _context.SaveChangesAsync();
-            return pokemons;
+        }
+        //await _context.Database.SqlQuery<Pokemon>($"Truncate Table Pokemon");
+        await _context.SaveChangesAsync();
+        return pokemons;
     }
 }

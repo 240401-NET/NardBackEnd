@@ -25,31 +25,52 @@ public class PokemonService : IPokemonService
         _pokemonRepository = repo;
     }
 
-    // public async Task FetchAndStorePokemon()
-    // {
-    //     var baseUrl = "https://pokeapi.co/api/v2/pokemon/";
-    //     for (int i = 1; i <= 151; i++)
-    //     {
-    //         var response = await _httpClient.GetAsync(baseUrl + i);
-    //         response.EnsureSuccessStatusCode();
-    //         var jsonData = await response.Content.ReadAsStringAsync();
-    //         var pokemon = JsonSerializer.Deserialize<PokemonDto>(jsonData);
-
-    //         var dbPokemon = new Pokemon
-    //         {
-    //             Id = pokemon.Id,
-    //             Name = pokemon.Name,
-    //             Types = new List<PokemonTypeContainer> { pokemon.Types[0], pokemon.Types[1] } // Assigning the first type to a list
-    //         };
-
-    //         await _context.Pokemon.AddAsync(dbPokemon);
-    //     }
-    //     await _context.SaveChangesAsync();
-    // }
-
     public async Task<List<Pokemon>> MakePokemonDBTable()
     {
         List<Pokemon> pokemons = await _pokemonRepository.MakePokemonDBTable();
         return(pokemons);
+    }
+
+    public async Task<Pokemon> SearchPokemon(string pokemonName)
+    {
+        // check the context database for the pokemon by name
+        var pokemon = await _context.Pokemon.FirstOrDefaultAsync(p => p.Name == pokemonName);
+        if (pokemon != null)
+        {
+            return pokemon;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public async Task<Pokemon> GetPokemon(int pokemonId)
+    {
+        // check the context database for the pokemon by id
+        var pokemon = await _context.Pokemon.FirstOrDefaultAsync(p => p.Id == pokemonId);
+        if (pokemon != null)
+        {
+            return pokemon;
+        }
+        else
+        {
+            return null;
+        }
+        
+    }
+
+    public async Task<IEnumerable<Pokemon>> GetAllPokemon()
+    {
+        // get all pokemon from the context database
+        var pokemons = await _context.Pokemon.ToListAsync();
+        if (pokemons != null)
+        {
+            return pokemons;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

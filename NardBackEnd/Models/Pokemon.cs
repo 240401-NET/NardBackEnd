@@ -15,6 +15,7 @@ public class Pokemon
     public int Sdef { get; set; }
     public int Spd { get; set; }
     public List<string> MovePool { get; set; }
+    public string Sprite {get; set;}
 
     // [ForeignKey("Move")]
     // public int MoveId1 { get; set; }
