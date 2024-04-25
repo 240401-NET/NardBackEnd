@@ -4556,31 +4556,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ricar\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Stooge\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\users\\ricar\\Documents\\Revature\\trainer-code\\NardBackEnd\\NardBackEnd\\NardBackEnd.csproj",
+      "projectUniqueName": "D:\\Revature\\Training\\Repositories\\240401-NET+AI\\NardBackEnd\\NardBackEnd\\NardBackEnd.csproj",
       "projectName": "NardBackEnd",
-      "projectPath": "C:\\users\\ricar\\Documents\\Revature\\trainer-code\\NardBackEnd\\NardBackEnd\\NardBackEnd.csproj",
-      "packagesPath": "C:\\Users\\ricar\\.nuget\\packages\\",
-      "outputPath": "C:\\users\\ricar\\Documents\\Revature\\trainer-code\\NardBackEnd\\NardBackEnd\\obj\\",
+      "projectPath": "D:\\Revature\\Training\\Repositories\\240401-NET+AI\\NardBackEnd\\NardBackEnd\\NardBackEnd.csproj",
+      "packagesPath": "C:\\Users\\Stooge\\.nuget\\packages\\",
+      "outputPath": "D:\\Revature\\Training\\Repositories\\240401-NET+AI\\NardBackEnd\\NardBackEnd\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\ricar\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Stooge\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

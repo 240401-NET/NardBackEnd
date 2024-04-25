@@ -47,8 +47,9 @@ public class PokemonService : IPokemonService
     //     await _context.SaveChangesAsync();
     // }
 
-    public async Task MakePokemonDBTable()
+    public async Task<List<Pokemon>> MakePokemonDBTable()
     {
-         _pokemonRepository.MakePokemonDBTable();
+        List<Pokemon> pokemons = await _pokemonRepository.MakePokemonDBTable();
+        return(pokemons);
     }
 }

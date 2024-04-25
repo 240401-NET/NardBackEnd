@@ -11,7 +11,7 @@ public interface IBattleService
 public interface IPokemonService
 {
     //Task FetchAndStorePokemon();
-    Task MakePokemonDBTable();
+    Task<List<Pokemon>> MakePokemonDBTable();
 }
 
 public interface IAudioService

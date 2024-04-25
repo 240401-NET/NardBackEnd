@@ -18,17 +18,19 @@ public class PokemonRepository : IPokemonRepository
     }
 
 
-    public async void MakePokemonDBTable()//returning async void might be problem
+    public async Task<List<Pokemon>> MakePokemonDBTable()//returning async void might be problem
     {
-        Pokemon dbPokemon = new Pokemon();
+        
+        List<Pokemon> pokemons = new List<Pokemon>();
         
         //make a loop
         for (int i = 1;i<=151;i++)
-            {//get a pokemon from pokeAPI
-            JsonDocument pokemon = await _pokeAPIService.GetPokemon(i.ToString());
+            {
+            Pokemon dbPokemon = new Pokemon();    
+            //get a pokemon from pokeAPI
+            JsonDocument pokemon = await _pokeAPIService.GetPokemon((i).ToString());
             //make pokemon from pokemon
-            //Id
-            dbPokemon.Id = pokemon.RootElement.GetProperty("id").GetInt32();            
+          
             //Name
             dbPokemon.Name = pokemon.RootElement.GetProperty("name").GetString();
             //List<Type> Types
@@ -38,9 +40,9 @@ public class PokemonRepository : IPokemonRepository
             {
                 typeList.Add(typeElement[j].GetProperty("type").GetProperty("name").ToString());
             }
+            dbPokemon.Types = typeList;
             //Hp
-            dbPokemon.Hp = pokemon.RootElement.GetProperty("stats")[0].GetProperty("base_stat").GetInt32();
-            
+            dbPokemon.Hp = pokemon.RootElement.GetProperty("stats")[0].GetProperty("base_stat").GetInt32();            
             //Atk
             dbPokemon.Atk = pokemon.RootElement.GetProperty("stats")[1].GetProperty("base_stat").GetInt32();
             //Satk
@@ -61,8 +63,11 @@ public class PokemonRepository : IPokemonRepository
             dbPokemon.MovePool = moveList;
             //post Pokemon to our DB
             _context.Pokemon.Add(dbPokemon);
+            pokemons.Add(dbPokemon);
             //savechanges 
-            _context.SaveChangesAsync();
+            
             }
+            await _context.SaveChangesAsync();
+            return pokemons;
     }
 }

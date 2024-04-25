@@ -1,6 +1,8 @@
+using Models;
+
 namespace Repository;
 
 public interface IPokemonRepository
 {
-    void MakePokemonDBTable();
+    Task<List<Pokemon>> MakePokemonDBTable();
 }
