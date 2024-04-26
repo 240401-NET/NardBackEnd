@@ -22,8 +22,10 @@ public class Startup
         services.AddHttpClient<IPokeAPIService, PokeAPIService>();
         services.AddHttpClient<IPokemonService, PokemonService>();
         services.AddHttpClient<IMoveService, MoveService>();
+        services.AddHttpClient<ITypeService, TypeService>();
         services.AddScoped<IPokemonRepository, PokemonRepository>();
         services.AddScoped<IMoveRepository, MoveRepository>();
+        services.AddScoped<ITypeRepository, TypeRepository>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

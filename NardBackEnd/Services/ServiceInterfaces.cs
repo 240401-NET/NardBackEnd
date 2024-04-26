@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Models;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -32,6 +33,7 @@ public interface IPokeAPIService
     // Task<IEnumerable<Pokemon>> GetGen1PokemonAsync();
     Task<JsonDocument> GetPokemon(string pokemon);
     Task<JsonDocument> GetMove(string moveId);
+    Task<JsonDocument> GetPokeType(int type);
 }
 
 public interface IMoveService
@@ -39,4 +41,11 @@ public interface IMoveService
     // Task<List<Move>> GetMoves();
     // Task<Move> GetMove(string moveId);
     Task<List<Move>> MakeMovesTable();
+}
+
+public interface ITypeService
+{
+    // Task<List<Type>> GetTypes();
+    // Task<Type> GetType(string typeId);
+    Task<List<Models.Type>> MakeTypeDBTable();
 }

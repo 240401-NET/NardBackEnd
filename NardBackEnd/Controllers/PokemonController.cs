@@ -18,35 +18,6 @@ public class PokemonController : ControllerBase
         _pokeService = pokemonService;
     }
 
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<Pokemon>> GetPokemon(int id)
-    // {
-    //     try
-    //     {
-    //         var pokemon = await _pokeAPIService.GetPokemonAsync(id);
-    //         if (pokemon == null)
-    //             return NotFound("Pokémon not found.");
-    //         return Ok(pokemon);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return StatusCode(500, "Internal server error.");
-    //     }
-    // }
-
-    // [HttpGet("allgen1")]
-    // public async Task<IActionResult> GetAllGen1Pokemon()
-    // {
-    //     try
-    //     {
-    //         var pokemons = await _pokeAPIService.GetGen1PokemonAsync();
-    //         return Ok(pokemons);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return StatusCode(500, "Error accessing PokéAPI for Gen 1 Pokémon");
-    //     }
-    // }
 
     [HttpPost("makepokemontable")]
     public async Task<List<Pokemon>> MakePokemonDBTable()
@@ -84,7 +55,7 @@ public class PokemonController : ControllerBase
         }
     }
 
-    [HttpGet("getPokemon")]
+    [HttpGet("getAllPokemon")]
     public async Task<IActionResult> GetAllPokemon()
     {
         try

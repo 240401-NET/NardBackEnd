@@ -37,7 +37,8 @@ public class MoveRepository : IMoveRepository
             {
                 dbMove.Power = move.RootElement.GetProperty("power").GetInt32();
             }
-            //dbMove.Power = move.RootElement.GetProperty("power").TryGetInt32(out int power) ? power : 0;
+            
+            dbMove.DamageClass = move.RootElement.GetProperty("damage_class").GetProperty("name").GetString();
 
             dbMove.Type = move.RootElement.GetProperty("type").GetProperty("name").GetString();
             

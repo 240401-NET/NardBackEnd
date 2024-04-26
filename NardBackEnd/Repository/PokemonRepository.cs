@@ -1,6 +1,5 @@
 using Models;
 using Data;
-using Data;
 using Service;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;

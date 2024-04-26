@@ -14,5 +14,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Battle> Battles { get; set; }
     public DbSet<Leaderboard> Leaderboards {get; set;}
     public DbSet<Track> Tracks {get; set;}
+    public DbSet<Models.Type> Types {get; set;}
 
 }

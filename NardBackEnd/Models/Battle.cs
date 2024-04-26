@@ -2,7 +2,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models;
 
-public class Battle{
+public class Battle
+{
     public int BattleId { get; set; }
     public string Status { get; set; }
     public string Winner { get; set; }
@@ -10,4 +11,6 @@ public class Battle{
     public int Pokemon1 { get; set; }//since pokemon are foreign keys
      [ForeignKey("Pokemon")]
     public int Pokemon2 { get; set; }// should they be type pokemon?
+    //List<Move> P1Moveset {get; set; }
+    //List<Move> P2Moveset {get; set; }
 }
