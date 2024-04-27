@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace NardBackEnd.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240427184535_SecretConnection")]
-    partial class SecretConnection
+    [Migration("20240427195410_StatBlockListString")]
+    partial class StatBlockListString
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,10 +33,26 @@ namespace NardBackEnd.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BattleId"));
 
-                    b.Property<int>("Pokemon1")
+                    b.Property<string>("P1Moves")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("P1StatBlock")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("P2Moves")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("P2StatBlock")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PokemonId1")
                         .HasColumnType("int");
 
-                    b.Property<int>("Pokemon2")
+                    b.Property<int>("PokemonId2")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -46,6 +62,9 @@ namespace NardBackEnd.Migrations
                     b.Property<string>("Winner")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("battlePhase")
+                        .HasColumnType("int");
 
                     b.HasKey("BattleId");
 

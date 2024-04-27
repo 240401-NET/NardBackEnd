@@ -5,7 +5,7 @@
 namespace NardBackEnd.Migrations
 {
     /// <inheritdoc />
-    public partial class SecretConnection : Migration
+    public partial class StatBlockListString : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

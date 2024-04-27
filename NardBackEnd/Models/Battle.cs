@@ -1,16 +1,43 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models;
 
 public class Battle
 {
+    [Key]
     public int BattleId { get; set; }
-    public string Status { get; set; }
-    public string Winner { get; set; }
-     [ForeignKey("Pokemon")]
-    public int Pokemon1 { get; set; }//since pokemon are foreign keys
-     [ForeignKey("Pokemon")]
-    public int Pokemon2 { get; set; }// should they be type pokemon?
-    //List<Move> P1Moveset {get; set; }
-    //List<Move> P2Moveset {get; set; }
+    public Status BattleStatus { get; set; }
+    public Winner BattleWinner { get; set; }
+    [ForeignKey("Pokemon")]
+    public int PokemonId1 { get; set; }
+    public List<string> P1StatBlock { get; set; }
+    public List<string> P1Moves { get; set; }
+    [ForeignKey("Pokemon")]
+    public int PokemonId2 { get; set; }
+    public List<string> P2StatBlock { get; set; }
+    public List<string> P2Moves { get; set; }
+    public BattlePhase battlePhase { get; set; }
+
+
+    public enum BattlePhase
+    {
+        Selection,
+        Attack,
+        Resolution,
+        End
+    }
+
+    public enum Status
+    {
+        InProgress,
+        Finished
+    }
+    public enum Winner
+    {
+        P1,
+        P2,
+        Draw,
+        NotFinished
+    }
 }

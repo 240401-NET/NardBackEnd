@@ -7,6 +7,12 @@ namespace Service;
 
 public interface IBattleService
 {
+    void CreateBattle(Battle battle);
+    void UpdateBattle(Battle battle);
+    string UpdateBattle(Battle battle, int firstToMove, bool move1Hit, bool move2Hit, Task<string> damageResult);
+    void DeleteBattle(int battleId);
+    Battle GetBattle(int battleId);
+    List<Battle> GetBattles();
 
 }
 
