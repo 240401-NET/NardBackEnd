@@ -42,9 +42,10 @@ public class BattleService:IBattleService
         string move2HitString = move2Hit ? "hit" : "miss";
 
         // build a string with the results of the round
-        string roundResult = $"{firstToMove}" +  move1HitString + move2HitString + damageResult;
+        string roundResult = $"{firstToMove}" +  move1HitString + move2HitString + damageResult.Result;
+        Task<string> _roundResult = Task.FromResult(roundResult);
 
-        return roundResult;
+        return _roundResult.Result;
     }
 
     public void DeleteBattle(int battleId)
@@ -64,7 +65,7 @@ public class BattleService:IBattleService
         return _context.Battles.ToList();
     }
 
-    public void NormalizePokemon(Battle battle)
+    public Battle NormalizePokemon(Battle battle)
     {
         Pokemon baseP1 = _context.Pokemon.Find(battle.PokemonId1);
         List<int> statsList1 = new List<int>(){baseP1.Hp, baseP1.Atk, baseP1.Def, baseP1.Satk, baseP1.Sdef, baseP1.Spd};
@@ -73,27 +74,31 @@ public class BattleService:IBattleService
         foreach (string stat in battle.P1StatBlock)
         {
             int baseStat = statsList1[battle.P1StatBlock.IndexOf(stat)];
-            string[] statPair = stat.Split(": ");  
+            string[] statPair = stat.Split(":");  
             p1Stats[statPair[0]] = (((baseStat+15)*100+25)/100)+5;
         }
         p1Stats["hp"] += 55;
         foreach (string stat in battle.P2StatBlock)
         {
             int baseStat = statsList2[battle.P2StatBlock.IndexOf(stat)];
-            string[] statPair = stat.Split(": ");  
+            string[] statPair = stat.Split(":");  
             p2Stats[statPair[0]] = (((baseStat+15)*100+25)/100)+5;
         }
         p2Stats["hp"] += 55;
         //reserialize p1Stats, p2Stats to battle statblocks string
+        battle.P1StatBlock = new List<string> { $"hp:{p1Stats["hp"]}", $"atk:{p1Stats["atk"]}", $"def:{p1Stats["def"]}", 
+        $"satk:{p1Stats["satk"]}", $"sdef:{p1Stats["sdef"]}", $"spd:{p1Stats["spd"]}" };
+        battle.P2StatBlock = new List<string> { $"hp:{p2Stats["hp"]}", $"atk:{p2Stats["atk"]}", $"def:{p2Stats["def"]}", 
+        $"satk:{p2Stats["satk"]}", $"sdef:{p2Stats["sdef"]}", $"spd:{p2Stats["spd"]}" };
+        return battle;
         
     }
 
     public int CalculatePriority(Battle battle, string pokemon1Move, string pokemon2Move)
     {
         // Get the moves from the database
-        var move1 = _context.Move.Find(pokemon1Move);
-        var move2 = _context.Move.Find(pokemon2Move);
-
+        var move1 = _context.Move.Where(m => m.Name == pokemon1Move).FirstOrDefault();      
+        var move2 = _context.Move.Where(m => m.Name == pokemon2Move).FirstOrDefault();
         //Parse StatBlocks into temporary struct or dictionary/map given that each statblock is a string containing all stats
         // each string should be in the format "hp: 1", "atk: 1", "def: 1", "satk: 1", "sdef: 1", "spd: 1"
         // each stat should be parsed into a string/int pair and stored in a dictionary
@@ -119,8 +124,8 @@ public class BattleService:IBattleService
 
     public bool CalculateHit(Battle battle, string move)
     {
-        // Get the move from the database
-        var move1 = _context.Move.Find(move);
+        // Get the move from the database where move name = move;
+        var move1 = _context.Move.Where(m => m.Name == move).FirstOrDefault();
 
         // Determine if the move hits
         return move1.Acc > new Random().Next(0, 100);
@@ -129,62 +134,94 @@ public class BattleService:IBattleService
     public async Task<string> CalculateDamage(Battle battle, string pokemon1Move, string pokemon2Move)
     {
         // Get the moves from the database
-        var move1 = _context.Move.Find(pokemon1Move);
-        var move2 = _context.Move.Find(pokemon2Move);
+        Move move1 = _context.Move.Where(m => m.Name == pokemon1Move).FirstOrDefault();
+        Move move2 = _context.Move.Where(m => m.Name == pokemon2Move).FirstOrDefault();
 
         // Get the attacking and defending pokemon
-        var p1 = _context.Pokemon.Find(battle.PokemonId1);
-        var p2 = _context.Pokemon.Find(battle.PokemonId2);
+        Pokemon p1 = _context.Pokemon.Find(battle.PokemonId1);
+        Pokemon p2 = _context.Pokemon.Find(battle.PokemonId2);
+
+        battle.P1StatBlock.ForEach(stat => {
+            string[] statPair = stat.Split(":");
+            p1Stats[statPair[0]] = int.Parse(statPair[1]);
+        });
+        battle.P2StatBlock.ForEach(stat => {
+            string[] statPair = stat.Split(":");
+            p2Stats[statPair[0]] = int.Parse(statPair[1]);
+        });
 
         var attackerStats = p1Stats;
         var defenderStats = p2Stats;
 
         // Get the attacking and defending stats
-        var attackerAtk = move1.DamageClass == "Physical" ? attackerStats["atk"] : attackerStats["sAtk"];
-        var defenderDef = move1.DamageClass == "Physical" ? defenderStats["def"] : defenderStats["sDef"];
-        var attackerAtk2 = move2.DamageClass == "Physical" ? attackerStats["atk"] : attackerStats["sAtk"];
-        var defenderDef2 = move2.DamageClass == "Physical" ? defenderStats["def"] : defenderStats["sDef"];
+        float attackerAtk = move1.DamageClass == "Physical" ? attackerStats["atk"] : attackerStats["satk"];
+        float defenderDef = move1.DamageClass == "Physical" ? defenderStats["def"] : defenderStats["sdef"];
+        float attackerAtk2 = move2.DamageClass == "Physical" ? attackerStats["atk"] : attackerStats["satk"];
+        float defenderDef2 = move2.DamageClass == "Physical" ? defenderStats["def"] : defenderStats["sdef"];
 
         //Look up the attacker's type by querying the database for the pokemon's type from its PokemonId
         //Look up the defender's type by querying the database for the pokemon's type from its PokemonId
 
-        var p1Type1 = _context.Pokemon.Find(battle.PokemonId1)?.Types[0];
-        var p1Type2 = _context.Pokemon.Find(battle.PokemonId1)?.Types[1];
-        var p2Type1 = _context.Pokemon.Find(battle.PokemonId2)?.Types[0];
-        var p2Type2 = _context.Pokemon.Find(battle.PokemonId2)?.Types[1];
+        string? p1Type1 = _context.Pokemon.Find(battle.PokemonId1)?.Types[0];
+        string? p1Type2 = null;
+        if (_context.Pokemon.Find(battle.PokemonId1)?.Types.Count > 1)
+        {
+            p1Type2 = _context.Pokemon.Find(battle.PokemonId1)?.Types[1];
+        }
+        string? p2Type1 = _context.Pokemon.Find(battle.PokemonId2)?.Types[0];
+        string? p2Type2 = null;
+        if (_context.Pokemon.Find(battle.PokemonId2)?.Types.Count > 1)
+        {
+            p2Type2 = _context.Pokemon.Find(battle.PokemonId2)?.Types[1];
+        }
 
         // Get the STAB multiplier
-        var STAB = (p1Type1 == move1.Type || p1Type2 == move1.Type) ? 1.5 : 1;
-        var STAB2 = (p2Type1 == move2.Type || p2Type2 == move2.Type) ? 1.5 : 1;
+        double STAB = 1;
+        double STAB2 = 1;
+        if (p1Type1 == move1.Type || p1Type2 == move1.Type)
+        {
+            STAB = 1.5;
+        }
+        if (p2Type1 == move2.Type || (p2Type2 != null && p2Type2 == move2.Type))
+        {
+            STAB2 = 1.5;
+        }
 
         // Get the type multiplier 
-        var TMultiplier = await GetTypeMultiplier(move1, p2);
-        var TMultiplier2 = await GetTypeMultiplier(move2, p1);
+        double TMultiplier = await GetTypeMultiplier(move1, p2);
+        double TMultiplier2 = await GetTypeMultiplier(move2, p1);
 
         // Get the random number
-        var rand = new Random().Next(217, 255);
+        float rand = new Random().Next(217, 255)/255.0f;
 
         // Calculate the damage
-        var damage = (22 * move1.Power * (attackerAtk / defenderDef) / 50) * STAB * TMultiplier * rand;
-        var damage2 = (22 * move2.Power * (attackerAtk2 / defenderDef2) / 50) * STAB2 * TMultiplier2 * rand;
+        double? damage = ((22 * move1.Power * attackerAtk/defenderDef / 50)+2) * STAB * TMultiplier * rand;
+        double? damage2 = ((22 * move2.Power * attackerAtk/defenderDef / 50)+2) * STAB2 * TMultiplier2 * rand;
 
         // Update the defender's HP
-        p1Stats["Hp"] -= (int)damage;
-        p2Stats["Hp"] -= (int)damage2;
+        p1Stats["hp"] -= (int)damage;
+        p2Stats["hp"] -= (int)damage2;
 
         // Return the result
-        return $"Player 1 dealt {damage} damage to Player 2. Player 2 has {p2Stats["Hp"]} HP remaining. Player 2 dealt {damage2} damage to Player 1. Player 1 has {p1Stats["Hp"]} HP remaining.";
+        //string fullString = $"Player 1 dealt {damage} damage to Player 2. Player 2 has {p2Stats["hp"]} HP remaining. Player 2 dealt {damage2} damage to Player 1. Player 1 has {p1Stats["hp"]} HP remaining.";
+        //string fullString = $"move 1 Power is {move1.Power}, attacker attack is {attackerAtk}, defender defense is {defenderDef}, STAB is {STAB}, TMultiplier is {TMultiplier}, rand is {rand}, damage is {damage}, defender HP is {p2Stats["hp"]}, move 2 Power is {move2.Power}, attacker attack is {attackerAtk2}, defender defense is {defenderDef2}, STAB is {STAB2}, TMultiplier is {TMultiplier2}, rand is {rand}, damage is {damage2}, defender HP is {p1Stats["hp"]}";
+        //string fullString = $"attackerAtk over defenderDef is {(attackerAtk/defenderDef)}";
+        string fullString = $"move1 Type is {move1.Type}, move2 Type is {move2.Type}, TMultiplier is {TMultiplier}, TMultiplier2 is {TMultiplier2}, p1 types are {p1Type1} and {p1Type2}, p2 types are {p2Type1} and {p2Type2}";
+        //string fullString = $"p2 type 1 is {p2.Types[0]}, move1 type is {move1.Type}, p2 Types count is {p2.Types.Count}";
+        Task<string> result = Task.FromResult(fullString);
+        return result.Result;
     }
 
-    public async Task<int> GetTypeMultiplier(Move move, Pokemon pokemon)
+    public async Task<double> GetTypeMultiplier(Move move, Pokemon pokemon)
     {
-        int m1 = await _context.Database.ExecuteSqlRawAsync($"SELECT {pokemon.Types[0]} FROM Type WHERE name=@move", new SqlParameter("@move", move));
-        int m2 = 1;
-        if (pokemon.Types.Count == 2)
-        {
-            m2 = await _context.Database.ExecuteSqlRawAsync($"SELECT {pokemon.Types[1]} FROM Type WHERE name=@move", new SqlParameter("@move", move));
-        }
-        return m1 * m2;
+        double m1 =  _context.Database.ExecuteSqlRaw($"SELECT {pokemon.Types[0]} FROM Types WHERE name={move.Type}");
+        // double m2 = 1;
+        // if (pokemon.Types.Count == 2)
+        // {
+            // m2 =  _context.Types.FromSqlRaw($"SELECT {pokemon.Types[1]} FROM Types WHERE name=@move", new SqlParameter("@move", move.Type));
+        // }
+        // return m1 * m2;
+        return m1;
     }
 
 

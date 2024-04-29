@@ -10,15 +10,7 @@ public class MoveService : IMoveService
     private readonly HttpClient _client;
     private readonly IMoveRepository _repo;
     private readonly ApplicationDbContext _context;
-    // public async Task<List<MoveService>> GetMoves()
-    // {
-    //     throw new System.NotImplementedException();
-    // }
 
-    // public async Task<Move> GetMove(string moveId)
-    // {
-    //     throw new System.NotImplementedException();
-    // }
     public MoveService(HttpClient httpClient, IMoveRepository moveRepository, ApplicationDbContext context)
     {
         _client = httpClient;
@@ -30,4 +22,16 @@ public class MoveService : IMoveService
         List<Move> moves = await _repo.MakeMovesTable();
         return(moves);
     }
+    // public async Task<List<MoveService>> GetMoves()
+    // {
+    //     throw new System.NotImplementedException();
+    // }
+
+    // public async Task<Move> GetMove(int moveId)
+    // {
+    //     throw new System.NotImplementedException();
+    // }
+    // public async Task<Move> GetMoveByName(string name){
+    //     return _context.Move.Where(p => p.Name.Equals(name, StringComparison.OrdinalCase));
+    // }
 }

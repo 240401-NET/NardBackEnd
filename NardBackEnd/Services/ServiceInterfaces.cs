@@ -11,6 +11,10 @@ public interface IBattleService
     void UpdateBattle(Battle battle);
     string UpdateBattle(Battle battle, int firstToMove, bool move1Hit, bool move2Hit, Task<string> damageResult);
     void DeleteBattle(int battleId);
+    int CalculatePriority(Battle battle, string pokemon1Move, string pokemon2Move);
+    bool CalculateHit(Battle battle, string move);
+    Task<string> CalculateDamage(Battle battle, string pokemon1Move, string pokemon2Move);
+    Battle NormalizePokemon(Battle battle);
     Battle GetBattle(int battleId);
     List<Battle> GetBattles();
 

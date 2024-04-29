@@ -8,13 +8,12 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 [ApiController]
 [Route("[Controller]")]
-
 public class BattleController : ControllerBase
 { 
 
-    private readonly BattleService _battleService;
+    private readonly IBattleService _battleService;
 
-    public BattleController(BattleService battleService)
+    public BattleController(IBattleService battleService)
     {
         _battleService = battleService;
     }
@@ -30,7 +29,9 @@ public class BattleController : ControllerBase
         Battle battle = new Battle
         {
             PokemonId1 = pokemonId1,
+            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
             PokemonId2 = pokemonId2,
+            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
             BattleWinner = Battle.Winner.NotFinished,
             BattleStatus = Battle.Status.InProgress,
             battlePhase = Battle.BattlePhase.Selection,
@@ -40,16 +41,16 @@ public class BattleController : ControllerBase
 
         // Normalize the pokemon to level 50 stats
         // TODO: Implement the logic to normalize the pokemon
-        _battleService.NormalizePokemon(battle);
+        battle = _battleService.NormalizePokemon(battle);
 
         // Persist the battle
         _battleService.CreateBattle(battle);
 
-        return Ok();
+        return Ok(battle.BattleId);
     }
 
     [HttpPut ("updateBattle/{battleId}/{pokemon1Move}/{pokemon2Move}")]
-    public IActionResult UpdateBattle(int battleId, string pokemon1Move, string pokemon2Move)
+    public async Task<IActionResult> UpdateBattle(int battleId, string pokemon1Move, string pokemon2Move)
     {
         // They'll send us attacking pokemon with their move choice for the round. (Put Endpoint)
         // We'll pass back string builder with attack order/priority, hit/miss, remaining hp and update hp on our end. (Result of the Put Endpoint)
@@ -81,7 +82,7 @@ public class BattleController : ControllerBase
         return Ok(JsonSerializer.Serialize(battle));
     }
 
-    [HttpGet]
+    [HttpGet ("getBattles")]
     public IActionResult GetBattles()
     {
         var battles = _battleService.GetBattles();
