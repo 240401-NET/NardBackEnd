@@ -19,9 +19,13 @@ public class BattleController : ControllerBase
         _battleService = battleService;
     }
 
-    [HttpPost]
-    public IActionResult CreateBattle(int pokemonId1, int pokemonId2, List<string> moves1, List<string> moves2)
+    [HttpPost ("createBattle/{pokemonId1}/{pokemonId2}/{moves1string}/{moves2string}")]
+    public IActionResult CreateBattle(int pokemonId1, int pokemonId2, string moves1string, string moves2string)
     {
+
+        List<string> moves1 = new List<string>(moves1string.Split(","));
+        List<string> moves2 = new List<string>(moves2string.Split(","));
+
         // Create a battle instance
         Battle battle = new Battle
         {
@@ -36,6 +40,7 @@ public class BattleController : ControllerBase
 
         // Normalize the pokemon to level 50 stats
         // TODO: Implement the logic to normalize the pokemon
+        _battleService.NormalizePokemon(battle);
 
         // Persist the battle
         _battleService.CreateBattle(battle);
@@ -43,7 +48,7 @@ public class BattleController : ControllerBase
         return Ok();
     }
 
-    [HttpPut]
+    [HttpPut ("updateBattle/{battleId}/{pokemon1Move}/{pokemon2Move}")]
     public IActionResult UpdateBattle(int battleId, string pokemon1Move, string pokemon2Move)
     {
         // They'll send us attacking pokemon with their move choice for the round. (Put Endpoint)
@@ -62,14 +67,14 @@ public class BattleController : ControllerBase
         return Ok(returnInfo);
     }
 
-    [HttpDelete]
+    [HttpDelete ("deleteBattle/{battleId}")]
     public IActionResult DeleteBattle(int battleId)
     {
         _battleService.DeleteBattle(battleId);
         return Ok();
     }
 
-    [HttpGet]
+    [HttpGet ("getBattle/{battleId}")]
     public IActionResult GetBattle(int battleId)
     {
         var battle = _battleService.GetBattle(battleId);

@@ -9,14 +9,16 @@ namespace Service;
 
 public class BattleService:IBattleService
 {
+    private readonly HttpClient _httpClient;
     private readonly ApplicationDbContext _context;
     private readonly IPokemonService _pokemonService;
     Dictionary<string, int> p1Stats = new Dictionary<string, int>(){ {"hp", 0}, {"atk", 0}, {"def", 0}, {"satk", 0}, {"sdef", 0}, {"spd", 0}};
     Dictionary<string, int> p2Stats = new Dictionary<string, int>(){ {"hp", 0}, {"atk", 0}, {"def", 0}, {"satk", 0}, {"sdef", 0}, {"spd", 0}};
 
 
-    public BattleService(ApplicationDbContext context, IPokemonService pokemonService)
+    public BattleService(ApplicationDbContext context, IPokemonService pokemonService, HttpClient httpClient)
     {
+        _httpClient = httpClient;
         _context = context;
         _pokemonService = pokemonService;
     }
@@ -72,16 +74,17 @@ public class BattleService:IBattleService
         {
             int baseStat = statsList1[battle.P1StatBlock.IndexOf(stat)];
             string[] statPair = stat.Split(": ");  
-            p1Stats[statPair[0]] = int.Parse(statPair[1])*(((baseStat+15)*100+25)/100)+5;
+            p1Stats[statPair[0]] = (((baseStat+15)*100+25)/100)+5;
         }
-        p1Stats["hp"] = int.Parse(battle.P1StatBlock[0].Split(": ")[1])*(((statsList1[0]+15)*100+25)/100)+60;
+        p1Stats["hp"] += 55;
         foreach (string stat in battle.P2StatBlock)
         {
             int baseStat = statsList2[battle.P2StatBlock.IndexOf(stat)];
             string[] statPair = stat.Split(": ");  
-            p2Stats[statPair[0]] = int.Parse(statPair[1])*(((baseStat+15)*100+25)/100)+5;
+            p2Stats[statPair[0]] = (((baseStat+15)*100+25)/100)+5;
         }
-        p2Stats["hp"] = int.Parse(battle.P2StatBlock[0].Split(": ")[1])*(((statsList2[0]+15)*100+25)/100)+60;
+        p2Stats["hp"] += 55;
+        //reserialize p1Stats, p2Stats to battle statblocks string
         
     }
 

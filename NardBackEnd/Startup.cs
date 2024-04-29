@@ -23,6 +23,7 @@ public class Startup
         services.AddHttpClient<IPokemonService, PokemonService>();
         services.AddHttpClient<IMoveService, MoveService>();
         services.AddHttpClient<ITypeService, TypeService>();
+        services.AddHttpClient<IBattleService, BattleService>();
         services.AddScoped<IPokemonRepository, PokemonRepository>();
         services.AddScoped<IMoveRepository, MoveRepository>();
         services.AddScoped<ITypeRepository, TypeRepository>();
