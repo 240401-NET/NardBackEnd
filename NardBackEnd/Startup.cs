@@ -17,8 +17,10 @@ public class Startup
     {
         services.AddControllers();
         services.AddSwaggerGen();
+        
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
         services.AddHttpClient<IPokeAPIService, PokeAPIService>();
         services.AddHttpClient<IPokemonService, PokemonService>();
         services.AddHttpClient<IMoveService, MoveService>();
@@ -27,7 +29,17 @@ public class Startup
         services.AddScoped<IPokemonRepository, PokemonRepository>();
         services.AddScoped<IMoveRepository, MoveRepository>();
         services.AddScoped<ITypeRepository, TypeRepository>();
+
+        services.AddCors(options => 
+            options.AddPolicy("MyCorsPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            }));
     }
+
+    
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
@@ -40,6 +52,7 @@ public class Startup
 
         app.UseHttpsRedirection();
         app.UseRouting();
+        app.UseCors("MyCorsPolicy");
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
