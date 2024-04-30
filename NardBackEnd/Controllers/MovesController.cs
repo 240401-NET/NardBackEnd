@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 public class MovesController : ControllerBase
 {
     private readonly IMoveService _moveService;
+    private readonly IPokemonService _pokeservice;
 
-    public MovesController(IMoveService moveService)
+    public MovesController(IMoveService moveService, IPokemonService pokeservice)
     {
         _moveService = moveService;
+        _pokeservice = pokeservice;
     }
 
     [HttpPost("makeMovesTable")]
@@ -64,5 +66,13 @@ public class MovesController : ControllerBase
         {
             return StatusCode(500, "Error accessing Database for moves");
         }
+    }
+
+        [HttpGet ("getRandomMoves/{pokemonId}")]
+    public async  Task<IActionResult> GetRandomMoveSet(int pokemonId)
+    {
+        Pokemon p = await _pokeservice.GetPokemon(pokemonId);
+        string randoMoves = _moveService.GetRandomMoveSet(p);
+        return Ok(randoMoves);
     }
 }

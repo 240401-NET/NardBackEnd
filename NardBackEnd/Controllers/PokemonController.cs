@@ -1,4 +1,4 @@
- using Service;
+using Service;
 using Models;
 using System.Text.Json; 
 using Microsoft.AspNetCore.Mvc;
@@ -67,5 +67,13 @@ public class PokemonController : ControllerBase
         {
             return StatusCode(500, "Error accessing Db for Pokémon");
         }
+    }
+
+    [HttpGet ("getRandomPokemon")]
+    public async Task<IActionResult> GetRandomPokemon()
+    {
+        
+        var randoMon = await _pokeService.GetPokemon(new Random().Next(1,151));;
+        return Ok(randoMon);
     }
 }

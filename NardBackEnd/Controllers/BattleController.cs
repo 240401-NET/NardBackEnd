@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.Text;
 
 
 [ApiController]
@@ -45,8 +46,26 @@ public class BattleController : ControllerBase
 
         // Persist the battle
         _battleService.CreateBattle(battle);
+        //create a string builder and loop through the p1statblock to create a string of stats
+        StringBuilder sb = new StringBuilder();
+        foreach (string stat in battle.P1StatBlock)
+        {
+            sb.Append(stat);
+            sb.Append(", ");
+        }
+        StringBuilder sb2 = new StringBuilder();
+        foreach (string stat in battle.P2StatBlock)
+        {
+            sb2.Append(stat);
+            sb2.Append(", ");
+        }
+        sb.Remove(sb.Length - 2, 2);
+        sb2.Remove(sb2.Length - 2, 2);
+        string sbString = sb.ToString();
+        string sbString2 = sb2.ToString();
+        string concatInfo = $"Battle id {battle.BattleId}, Pokemon 1 stat block is {sbString}, Pokemon 2 stat block is {sbString2}";
 
-        return Ok(battle.BattleId);
+        return Ok(concatInfo);
     }
 
     [HttpPut ("updateBattle/{battleId}/{pokemon1Move}/{pokemon2Move}")]
@@ -90,11 +109,3 @@ public class BattleController : ControllerBase
     }
 }
 
-    //TODO: 
-        // They'll pass us battleid, two pokemon, and two move lists. (Post Endpoint)
-        // we'll create a battle instance, normalize the pokemon to lvl 50 stats, and persist it. (Result of the Post Endpoint)
-        // They'll send us attacking pokemon with their move choice for the round. (Put Endpoint)
-        // We'll pass back string builder with attack order/priority, hit/miss, remaining hp and update hp on our end. (Result of the Put Endpoint)
-        // They'll let us know if the battle is over so we can remove the battle from the database. (Delete Endpoint)
-
-    // }

@@ -2,6 +2,7 @@ using Models;
 using Data;
 using Repository;
 using System.Text.Json;
+using System.Text;
 
 namespace Service;
 
@@ -10,12 +11,14 @@ public class MoveService : IMoveService
     private readonly HttpClient _client;
     private readonly IMoveRepository _repo;
     private readonly ApplicationDbContext _context;
+    private readonly IPokemonService _pokeservice;
 
-    public MoveService(HttpClient httpClient, IMoveRepository moveRepository, ApplicationDbContext context)
+    public MoveService(HttpClient httpClient, IMoveRepository moveRepository, ApplicationDbContext context, IPokemonService pokemonService)
     {
         _client = httpClient;
         _repo = moveRepository;
         _context = context;
+        _pokeservice = pokemonService;
     }
     public async Task<List<Move>> MakeMovesTable()
     {
@@ -33,5 +36,30 @@ public class MoveService : IMoveService
     }
     public async Task<Move> GetMoveByName(string name){
         return _context.Move.Where(p => p.Name == name).FirstOrDefault();
+    }
+
+    public string GetRandomMoveSet(Pokemon p)
+    {
+        
+        var rand = new Random();
+        string moves = "";
+
+        HashSet<int> selectedIndexes = new HashSet<int>();
+        while (selectedIndexes.Count < 4)
+        {
+            int index = rand.Next(p.MovePool.Count);
+            selectedIndexes.Add(index);
+
+        }
+        StringBuilder builder = new StringBuilder();
+        foreach (int index in selectedIndexes)
+        {
+            builder.Append(p.MovePool[index]);
+            builder.Append(",");
+        }
+        builder.Length-=1;
+        moves = builder.ToString();
+                
+        return  moves;
     }
 }

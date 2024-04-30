@@ -26,15 +26,6 @@ public interface IPokemonService
     Task<Pokemon> SearchPokemon(string pokemonName);
     Task<Pokemon> GetPokemon(int pokemonId);
     Task<IEnumerable<Pokemon>> GetAllPokemon();
-}
-
-public interface IAudioService
-{
-
-}
-
-public interface IImageService
-{
 
 }
 
@@ -54,6 +45,7 @@ public interface IMoveService
     Task<List<Move>> GetMoves();
     Task<Move> GetMove(int moveId);
     Task<Move> GetMoveByName(string name);
+    string GetRandomMoveSet(Pokemon pokemon);
 }
 
 public interface ITypeService
@@ -61,4 +53,14 @@ public interface ITypeService
     // Task<List<Type>> GetTypes();
     // Task<Type> GetType(string typeId);
     Task<List<Models.Type>> MakeTypeDBTable();
+}
+
+public interface ILeaderboardService
+{
+    void CreateLeaderboard(Leaderboard leaderboard);
+    void UpdateLeaderboard(Leaderboard leaderboard, int winLossPoint);
+    void DeleteLeaderboard(int leaderboardId);
+    Leaderboard GetLeaderboard(int leaderboardId);
+    List<Leaderboard> GetLeaderboards();
+    
 }
