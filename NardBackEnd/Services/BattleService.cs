@@ -176,53 +176,100 @@ public class BattleService:IBattleService
         }
 
         // Get the STAB multiplier
-        double STAB = 1;
-        double STAB2 = 1;
+        float STAB = 1;
+        float STAB2 = 1;
         if (p1Type1 == move1.Type || p1Type2 == move1.Type)
         {
-            STAB = 1.5;
+            STAB = 1.5f;
         }
         if (p2Type1 == move2.Type || (p2Type2 != null && p2Type2 == move2.Type))
         {
-            STAB2 = 1.5;
+            STAB2 = 1.5f;
         }
 
         // Get the type multiplier 
-        double TMultiplier = await GetTypeMultiplier(move1, p2);
-        double TMultiplier2 = await GetTypeMultiplier(move2, p1);
+        float TMultiplier =  GetTypeMultiplier(move1, p2);
+        float TMultiplier2 =  GetTypeMultiplier(move2, p1);
 
         // Get the random number
         float rand = new Random().Next(217, 255)/255.0f;
 
         // Calculate the damage
-        double? damage = ((22 * move1.Power * attackerAtk/defenderDef / 50)+2) * STAB * TMultiplier * rand;
-        double? damage2 = ((22 * move2.Power * attackerAtk/defenderDef / 50)+2) * STAB2 * TMultiplier2 * rand;
+        float? damage = ((22 * move1.Power * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand;
+        float? damage2 = ((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand;
 
         // Update the defender's HP
-        p1Stats["hp"] -= (int)damage;
-        p2Stats["hp"] -= (int)damage2;
+        p1Stats["hp"] -= (int)damage2;
+        p2Stats["hp"] -= (int)damage;
 
         // Return the result
-        //string fullString = $"Player 1 dealt {damage} damage to Player 2. Player 2 has {p2Stats["hp"]} HP remaining. Player 2 dealt {damage2} damage to Player 1. Player 1 has {p1Stats["hp"]} HP remaining.";
+        string fullString = $"{p1.Name} dealt {damage} damage to {p2.Name}. It was {TMultiplier}x\'s effective. {p2.Name} has {p2Stats["hp"]} HP remaining. {p2.Name} dealt {damage2} damage to {p1.Name}. It was {TMultiplier2}x\'s effective. {p1.Name} has {p1Stats["hp"]} HP remaining.";
         //string fullString = $"move 1 Power is {move1.Power}, attacker attack is {attackerAtk}, defender defense is {defenderDef}, STAB is {STAB}, TMultiplier is {TMultiplier}, rand is {rand}, damage is {damage}, defender HP is {p2Stats["hp"]}, move 2 Power is {move2.Power}, attacker attack is {attackerAtk2}, defender defense is {defenderDef2}, STAB is {STAB2}, TMultiplier is {TMultiplier2}, rand is {rand}, damage is {damage2}, defender HP is {p1Stats["hp"]}";
         //string fullString = $"attackerAtk over defenderDef is {(attackerAtk/defenderDef)}";
-        string fullString = $"move1 Type is {move1.Type}, move2 Type is {move2.Type}, TMultiplier is {TMultiplier}, TMultiplier2 is {TMultiplier2}, p1 types are {p1Type1} and {p1Type2}, p2 types are {p2Type1} and {p2Type2}";
+        // string fullString = $"move1 Type is {move1.Type}, move2 Type is {move2.Type}, TMultiplier is {TMultiplier}, TMultiplier2 is {TMultiplier2}, p1 types are {p1Type1} and {p1Type2}, p2 types are {p2Type1} and {p2Type2}";
         //string fullString = $"p2 type 1 is {p2.Types[0]}, move1 type is {move1.Type}, p2 Types count is {p2.Types.Count}";
         Task<string> result = Task.FromResult(fullString);
         return result.Result;
     }
 
-    public async Task<double> GetTypeMultiplier(Move move, Pokemon pokemon)
+    public float GetTypeMultiplier(Move move, Pokemon pokemon)
     {
-        double m1 =  _context.Database.ExecuteSqlRaw($"SELECT {pokemon.Types[0]} FROM Types WHERE name={move.Type}");
-        // double m2 = 1;
-        // if (pokemon.Types.Count == 2)
-        // {
-            // m2 =  _context.Types.FromSqlRaw($"SELECT {pokemon.Types[1]} FROM Types WHERE name=@move", new SqlParameter("@move", move.Type));
-        // }
-        // return m1 * m2;
-        return m1;
+        float m1 =  _context.Types
+                .Where(t => t.Name == move.Type)
+                .Select(t => pokemon.Types[0] == "bug"?t.Bug:
+                             pokemon.Types[0] == "dark"?t.Dark:
+                             pokemon.Types[0] == "dragon"?t.Dragon:
+                             pokemon.Types[0] == "electric"?t.Electric:
+                             pokemon.Types[0] == "fairy"?t.Fairy:
+                             pokemon.Types[0] == "fighting"?t.Fighting:
+                             pokemon.Types[0] == "fire"?t.Fire:
+                             pokemon.Types[0] == "ghost"?t.Ghost:
+                             pokemon.Types[0] == "grass"?t.Grass:
+                             pokemon.Types[0] == "ice"?t.Ice:
+                             pokemon.Types[0] == "normal"?t.Normal:
+                             pokemon.Types[0] == "poison"?t.Poison:
+                             pokemon.Types[0] == "psychic"?t.Psychic:
+                             pokemon.Types[0] == "rock"?t.Rock:  
+                             pokemon.Types[0] == "shadow"?t.Shadow:
+                             pokemon.Types[0] == "steel"?t.Steel:
+                             pokemon.Types[0] == "unknown"?t.Unknown:
+                             pokemon.Types[0] == "water"?t.Water:
+                             1
+                             
+                             )
+
+                .FirstOrDefault();
+        float m2 = 1;
+        if (pokemon.Types.Count == 2)
+        {
+            m2 =  _context.Types
+                .Where(t => t.Name == move.Type)
+                .Select(t => pokemon.Types[1] == "bug"?t.Bug:
+                             pokemon.Types[1] == "dark"?t.Dark:
+                             pokemon.Types[1] == "dragon"?t.Dragon:
+                             pokemon.Types[1] == "electric"?t.Electric:
+                             pokemon.Types[1] == "fairy"?t.Fairy:
+                             pokemon.Types[1] == "fighting"?t.Fighting:
+                             pokemon.Types[1] == "fire"?t.Fire:
+                             pokemon.Types[1] == "ghost"?t.Ghost:
+                             pokemon.Types[1] == "grass"?t.Grass:
+                             pokemon.Types[1] == "ice"?t.Ice:
+                             pokemon.Types[1] == "normal"?t.Normal:
+                             pokemon.Types[1] == "poison"?t.Poison:
+                             pokemon.Types[1] == "psychic"?t.Psychic:
+                             pokemon.Types[1] == "rock"?t.Rock:  
+                             pokemon.Types[1] == "shadow"?t.Shadow:
+                             pokemon.Types[1] == "steel"?t.Steel:
+                             pokemon.Types[1] == "unknown"?t.Unknown:
+                             pokemon.Types[1] == "water"?t.Water:
+                             1
+                             
+                             ).FirstOrDefault();
+        }
+        return m1 * m2;
+        
     }
+
 
 
 
