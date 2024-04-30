@@ -22,16 +22,16 @@ public class MoveService : IMoveService
         List<Move> moves = await _repo.MakeMovesTable();
         return(moves);
     }
-    // public async Task<List<MoveService>> GetMoves()
-    // {
-    //     throw new System.NotImplementedException();
-    // }
+    public async Task<List<Move>> GetMoves()
+    {
+        return _context.Move.ToList();
+    }
 
-    // public async Task<Move> GetMove(int moveId)
-    // {
-    //     throw new System.NotImplementedException();
-    // }
-    // public async Task<Move> GetMoveByName(string name){
-    //     return _context.Move.Where(p => p.Name.Equals(name, StringComparison.OrdinalCase));
-    // }
+    public async Task<Move> GetMove(int moveId)
+    {
+        return _context.Move.Find(moveId);
+    }
+    public async Task<Move> GetMoveByName(string name){
+        return _context.Move.Where(p => p.Name == name).FirstOrDefault();
+    }
 }

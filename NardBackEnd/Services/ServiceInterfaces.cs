@@ -51,6 +51,9 @@ public interface IMoveService
     // Task<List<Move>> GetMoves();
     // Task<Move> GetMove(string moveId);
     Task<List<Move>> MakeMovesTable();
+    Task<List<Move>> GetMoves();
+    Task<Move> GetMove(int moveId);
+    Task<Move> GetMoveByName(string name);
 }
 
 public interface ITypeService

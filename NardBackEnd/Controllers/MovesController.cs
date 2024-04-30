@@ -23,31 +23,46 @@ public class MovesController : ControllerBase
         return movesDb;
     }
 
-    // [HttpGet("allMoves")]
-    // public async Task<IActionResult> GetAllMoves()
-    // {
-    //     try
-    //     {
-    //         var moves = await _moveService.GetMoves();
-    //         return Ok(moves);
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(500, "Error accessing PokeAPI for moves");
-    //     }
-    // }
+    [HttpGet("allMoves")]
+    public async Task<IActionResult> GetAllMoves()
+    {
+        try
+        {
+            var moves = await _moveService.GetMoves();
+            return Ok(moves);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Error accessing Database for moves");
+        }
+    }
 
-    // [HttpGet("getMove/{moveId}")]
-    // public async Task<IActionResult> GetMove(string moveId)
-    // {
-    //     try
-    //     {
-    //         var move = await _moveService.GetMoves(moveId);
-    //         return Ok(move);
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(500, "Error accessing PokeAPI for moves");
-    //     }
-    // }
+    [HttpGet("getMove/{moveId}")]
+    public async Task<IActionResult> GetMove(int moveId)
+    {
+        try
+        {
+            var move = await _moveService.GetMove(moveId);
+            return Ok(move);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Error accessing Database for moves");
+        }
+    }
+
+    // add a get moves by name
+    [HttpGet("getMoveByName/{name}")]
+    public async Task<IActionResult> GetMoveByName(string name)
+    {
+        try
+        {
+            var move = await _moveService.GetMoveByName(name);
+            return Ok(move);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Error accessing Database for moves");
+        }
+    }
 }

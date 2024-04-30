@@ -41,9 +41,17 @@ public class BattleService:IBattleService
         string move1HitString = move1Hit ? "hit" : "miss";
         string move2HitString = move2Hit ? "hit" : "miss";
 
+        battle.P1StatBlock = new List<string> { $"hp:{p1Stats["hp"]}", $"atk:{p1Stats["atk"]}", $"def:{p1Stats["def"]}", 
+        $"satk:{p1Stats["satk"]}", $"sdef:{p1Stats["sdef"]}", $"spd:{p1Stats["spd"]}" };
+        battle.P2StatBlock = new List<string> { $"hp:{p2Stats["hp"]}", $"atk:{p2Stats["atk"]}", $"def:{p2Stats["def"]}", 
+        $"satk:{p2Stats["satk"]}", $"sdef:{p2Stats["sdef"]}", $"spd:{p2Stats["spd"]}" };
+
         // build a string with the results of the round
         string roundResult = $"{firstToMove}" +  move1HitString + move2HitString + damageResult.Result;
         Task<string> _roundResult = Task.FromResult(roundResult);
+
+        _context.Battles.Update(battle);
+        _context.SaveChanges();
 
         return _roundResult.Result;
     }
