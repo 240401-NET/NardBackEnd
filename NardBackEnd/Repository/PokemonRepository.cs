@@ -61,6 +61,7 @@ public class PokemonRepository : IPokemonRepository
                     moveList.Add(movesElement[k].GetProperty("move").GetProperty("name").ToString());
                     // Console.WriteLine(moveList[i]);
                 }
+            moveList = await assureGen1Move(moveList);
             dbPokemon.MovePool = moveList;
             dbPokemon.Sprite = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{i}.png";
             //post Pokemon to our DB
@@ -72,5 +73,23 @@ public class PokemonRepository : IPokemonRepository
         //await _context.Database.SqlQuery<Pokemon>($"Truncate Table Pokemon");
         await _context.SaveChangesAsync();
         return pokemons;
+    }
+
+    public async Task<List<string>> assureGen1Move(List<string> mlist)
+    {
+        List<string> templist = new List<string>();
+        foreach (string s in mlist)
+        {
+            templist.Add(s);
+        }
+        foreach(string s in mlist) 
+        {
+            var currMove = await _pokeAPIService.GetMove(s);
+            if (currMove.RootElement.GetProperty("id").GetInt32()>165)
+            {
+                templist.Remove(s);
+            }
+        }
+        return templist;
     }
 }
