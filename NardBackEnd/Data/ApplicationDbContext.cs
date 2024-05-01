@@ -9,10 +9,10 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    public DbSet<Pokemon> Pokemon { get; set; }
-    public DbSet<Move> Move { get; set; }
-    public DbSet<Battle> Battles { get; set; }
-    public DbSet<Leaderboard> Leaderboards {get; set;}
-    public DbSet<Models.Type> Types {get; set;}
+    public virtual DbSet<Pokemon> Pokemon { get; set; }
+    public virtual DbSet<Move> Move { get; set; }
+    public virtual DbSet<Battle> Battles { get; set; }
+    public virtual DbSet<Leaderboard> Leaderboards {get; set;}
+    public virtual DbSet<Models.Type> Types {get; set;}
 
 }

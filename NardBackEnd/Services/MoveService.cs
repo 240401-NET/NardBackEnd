@@ -43,9 +43,15 @@ public class MoveService : IMoveService
         
         var rand = new Random();
         string moves = "";
+        int maxindex = 4;
+
+        if (p.MovePool.Count<4)
+        {
+            maxindex = p.MovePool.Count;
+        }
 
         HashSet<int> selectedIndexes = new HashSet<int>();
-        while (selectedIndexes.Count < 4)
+        while (selectedIndexes.Count < maxindex)
         {
             int index = rand.Next(p.MovePool.Count);
             selectedIndexes.Add(index);
