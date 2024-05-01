@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
+namespace Controllers;
 [ApiController]
 [Route("[Controller]")]
 public class MovesController : ControllerBase

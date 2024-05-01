@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Text;
 
-
+namespace Controllers;
 [ApiController]
 [Route("[Controller]")]
 public class BattleController : ControllerBase

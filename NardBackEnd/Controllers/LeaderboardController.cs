@@ -8,7 +8,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 
 
-
+namespace Controllers;
 [ApiController]
 [Route("[Controller]")]
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
+namespace Controllers;
 [ApiController]
 [Route("[controller]")]
 public class TypeController:ControllerBase

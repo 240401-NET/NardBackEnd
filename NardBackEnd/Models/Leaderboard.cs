@@ -9,6 +9,7 @@ public class Leaderboard
     public int Id {get; set;}
     [ForeignKey("Pokemon")]
     public int PokemonId {get; set;}
+    public string PokemonName {get; set;}
     public int Rank {get; set;}
     public int Win {get; set;}
     public int Loss {get; set;}
