@@ -57,12 +57,15 @@ public class PokemonRepository : IPokemonRepository
             //List<move>
             List<string> moveList = new List<string>();
             var movesElement = pokemon.RootElement.GetProperty("moves");
-            for(int k = 0; k < movesElement.GetArrayLength();k++){                    
-                    moveList.Add(movesElement[k].GetProperty("move").GetProperty("name").ToString());
-                    // Console.WriteLine(moveList[i]);
+            var moves = _context.Move.Select(n=>n.Name).ToList();
+            for(int k = 0; k < movesElement.GetArrayLength();k++){ 
+                    if (moves.Contains(movesElement[k].GetProperty("move").GetProperty("name").ToString()))
+                    {
+                        moveList.Add(movesElement[k].GetProperty("move").GetProperty("name").ToString());
+                        // Console.WriteLine(moveList[i]);
+                    }                   
                 }
-            List<Move> moves= _context.Move.ToList();
-            moveList = await assureGen1Move(moves, moveList);
+            // moveList = await assureGen1Move(moves, moveList);
             dbPokemon.MovePool = moveList;
             dbPokemon.Sprite = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{i}.png";
             //post Pokemon to our DB

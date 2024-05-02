@@ -13,23 +13,27 @@ public class BattleController : ControllerBase
 { 
 
     private readonly IBattleService _battleService;
+    private readonly IPokemonService _pokemonService;
 
-    public BattleController(IBattleService battleService)
+    public BattleController(IBattleService battleService, IPokemonService pokemonService)
     {
         _battleService = battleService;
+        _pokemonService = pokemonService;
     }
 
-    [HttpPost ("createBattle/{pokemonId1}/{pokemonId2}/{moves1string}/{moves2string}")]
-    public IActionResult CreateBattle(int pokemonId1, int pokemonId2, string moves1string, string moves2string)
+    [HttpPost ("createBattle/{pokemon1Name}/{pokemonId2}/{moves1string}/{moves2string}")]
+    public async Task<IActionResult> CreateBattle(string pokemon1Name, int pokemonId2, string moves1string, string moves2string)
     {
 
         List<string> moves1 = new List<string>(moves1string.Split(","));
         List<string> moves2 = new List<string>(moves2string.Split(","));
 
+        Pokemon pokemon1 = await _pokemonService.SearchPokemon(pokemon1Name);
+
         // Create a battle instance
         Battle battle = new Battle
         {
-            PokemonId1 = pokemonId1,
+            PokemonId1 = pokemon1.Id,
             P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
             PokemonId2 = pokemonId2,
             P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
