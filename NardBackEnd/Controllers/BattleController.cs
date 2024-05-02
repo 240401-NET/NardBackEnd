@@ -69,7 +69,7 @@ public class BattleController : ControllerBase
         string sbString2 = sb2.ToString();
         string concatInfo = $"Battle id {battle.BattleId}, Pokemon 1 stat block is {sbString}, Pokemon 2 stat block is {sbString2}";
 
-        return Ok(concatInfo);
+        return Ok(battle);
     }
 
     [HttpPut ("updateBattle/{battleId}/{pokemon1Move}/{pokemon2Move}")]
