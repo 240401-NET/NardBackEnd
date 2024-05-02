@@ -45,7 +45,7 @@ public interface IMoveService
     Task<List<Move>> GetMoves();
     Task<Move> GetMove(int moveId);
     Task<Move> GetMoveByName(string name);
-    string GetRandomMoveSet(Pokemon pokemon);
+    string[] GetRandomMoveSet(Pokemon pokemon);
 }
 
 public interface ITypeService

@@ -38,11 +38,11 @@ public class MoveService : IMoveService
         return _context.Move.Where(p => p.Name == name).FirstOrDefault();
     }
 
-    public string GetRandomMoveSet(Pokemon p)
+    public string[] GetRandomMoveSet(Pokemon p)
     {
         
         var rand = new Random();
-        string moves = "";
+        string[] moves = new string[4];
         int maxindex = 4;
 
         if (p.MovePool.Count<4)
@@ -57,14 +57,17 @@ public class MoveService : IMoveService
             selectedIndexes.Add(index);
 
         }
-        StringBuilder builder = new StringBuilder();
+        // StringBuilder builder = new StringBuilder();
+        int i = 0;
         foreach (int index in selectedIndexes)
         {
-            builder.Append(p.MovePool[index]);
-            builder.Append(",");
+            // builder.Append(p.MovePool[index]);
+            // builder.Append(",");
+            moves[i]=p.MovePool[index];
+            i++;
         }
-        builder.Length-=1;
-        moves = builder.ToString();
+        // builder.Length-=1;
+        // moves = builder.ToString();
                 
         return  moves;
     }
