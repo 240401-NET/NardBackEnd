@@ -73,7 +73,7 @@ public class MovesController : ControllerBase
     public async  Task<IActionResult> GetRandomMoveSet(int pokemonId)
     {
         Pokemon p = await _pokeservice.GetPokemon(pokemonId);
-        string[] randoMoves = _moveService.GetRandomMoveSet(p);
+        string randoMoves = _moveService.GetRandomMoveSet(p);
         return Ok(randoMoves);
     }
 }
