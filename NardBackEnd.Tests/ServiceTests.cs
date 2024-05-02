@@ -518,6 +518,5 @@ public class ServiceTests
 
         string randomMoveSet =  moveService.GetRandomMoveSet(testPoke);
 
-        Assert.Equal(4, randomMoveSet.Split(',').Length);
-    }
+        Assert.Equal(4, randomMoveSet.Split(",").Length);
 }
