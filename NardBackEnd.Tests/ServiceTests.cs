@@ -371,10 +371,24 @@ public class ServiceTests
         testMoveRepo.Setup(Repository => Repository.MakeMovesTable()).ReturnsAsync(testMove);
 
         Mock<HttpClient> http = new  Mock<HttpClient>();
-        Mock<ApplicationDbContext> context = new Mock<ApplicationDbContext>();
-        Mock<IPokemonService> pokeService = new Mock<IPokemonService>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        // Create a mock set
+        var mockSet = new Mock<DbSet<Move>>();
+        mockSet.As<IQueryable<Move>>().Setup(m => m.Provider).Returns(testMove.AsQueryable().Provider);
+        mockSet.As<IQueryable<Move>>().Setup(m => m.Expression).Returns(testMove.AsQueryable().Expression);
+        mockSet.As<IQueryable<Move>>().Setup(m => m.ElementType).Returns(testMove.AsQueryable().ElementType);
+        mockSet.As<IQueryable<Move>>().Setup(m => m.GetEnumerator()).Returns(testMove.GetEnumerator());
 
-        MoveService moveService = new MoveService(http.Object,testMoveRepo.Object,context.Object,pokeService.Object);
+        // Setup the mock context
+        var mockContext = new Mock<ApplicationDbContext>(options);
+        mockContext.Setup(c => c.Move).Returns(mockSet.Object);
+
+        Mock<IPokemonService> pokeService = new Mock<IPokemonService>();
+        // Pass the mock context to the MoveService
+        MoveService moveService = new MoveService(http.Object, testMoveRepo.Object, mockContext.Object, pokeService.Object);
+        
+
+        
 
         Move foundMove = await moveService.GetMove(1);
 
