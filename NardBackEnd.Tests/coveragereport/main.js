@@ -221,26 +221,17 @@ var assemblies = [
   {
     "name": "NardBackEnd",
     "classes": [
-      { "name": "BattleController", "rp": "NardBackEnd_BattleController.html", "cl": 0, "ucl": 61, "cal": 61, "tl": 111, "cb": 0, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "LeaderboardController", "rp": "NardBackEnd_LeaderboardController.html", "cl": 0, "ucl": 49, "cal": 49, "tl": 107, "cb": 0, "tb": 8, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Models.Battle", "rp": "NardBackEnd_Battle.html", "cl": 0, "ucl": 10, "cal": 10, "tl": 43, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Models.Leaderboard", "rp": "NardBackEnd_Leaderboard.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Models.Move", "rp": "NardBackEnd_Move.html", "cl": 0, "ucl": 9, "cal": 9, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Models.Pokemon", "rp": "NardBackEnd_Pokemon.html", "cl": 0, "ucl": 11, "cal": 11, "tl": 28, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Models.Type", "rp": "NardBackEnd_Type.html", "cl": 0, "ucl": 22, "cal": 22, "tl": 32, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "MovesController", "rp": "NardBackEnd_MovesController.html", "cl": 0, "ucl": 38, "cal": 38, "tl": 79, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "PokemonController", "rp": "NardBackEnd_PokemonController.html", "cl": 0, "ucl": 37, "cal": 37, "tl": 80, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Repository.MoveRepository", "rp": "NardBackEnd_MoveRepository.html", "cl": 0, "ucl": 32, "cal": 32, "tl": 64, "cb": 0, "tb": 12, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Repository.PokemonRepository", "rp": "NardBackEnd_PokemonRepository.html", "cl": 0, "ucl": 38, "cal": 38, "tl": 108, "cb": 0, "tb": 6, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Repository.TypeRepository", "rp": "NardBackEnd_TypeRepository.html", "cl": 0, "ucl": 175, "cal": 175, "tl": 264, "cb": 0, "tb": 290, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Service.BattleService", "rp": "NardBackEnd_BattleService.html", "cl": 0, "ucl": 189, "cal": 189, "tl": 299, "cb": 0, "tb": 80, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Service.LeaderboardService", "rp": "NardBackEnd_LeaderboardService.html", "cl": 0, "ucl": 49, "cal": 49, "tl": 76, "cb": 0, "tb": 12, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Service.MoveService", "rp": "NardBackEnd_MoveService.html", "cl": 0, "ucl": 39, "cal": 39, "tl": 65, "cb": 0, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Service.PokeAPIService", "rp": "NardBackEnd_PokeAPIService.html", "cl": 0, "ucl": 32, "cal": 32, "tl": 63, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Service.PokemonService", "rp": "NardBackEnd_PokemonService.html", "cl": 0, "ucl": 34, "cal": 34, "tl": 78, "cb": 0, "tb": 6, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Service.TypeService", "rp": "NardBackEnd_TypeService.html", "cl": 0, "ucl": 9, "cal": 9, "tl": 24, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Startup", "rp": "NardBackEnd_Startup.html", "cl": 0, "ucl": 44, "cal": 44, "tl": 66, "cb": 0, "tb": 2, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "TypeController", "rp": "NardBackEnd_TypeController.html", "cl": 0, "ucl": 8, "cal": 8, "tl": 30, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Models.Battle", "rp": "NardBackEnd_Battle.html", "cl": 10, "ucl": 0, "cal": 10, "tl": 43, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Models.Leaderboard", "rp": "NardBackEnd_Leaderboard.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Models.Move", "rp": "NardBackEnd_Move.html", "cl": 9, "ucl": 0, "cal": 9, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Models.Pokemon", "rp": "NardBackEnd_Pokemon.html", "cl": 11, "ucl": 0, "cal": 11, "tl": 28, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Models.Type", "rp": "NardBackEnd_Type.html", "cl": 21, "ucl": 1, "cal": 22, "tl": 32, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Service.BattleService", "rp": "NardBackEnd_BattleService.html", "cl": 55, "ucl": 133, "cal": 188, "tl": 302, "cb": 6, "tb": 80, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Service.LeaderboardService", "rp": "NardBackEnd_LeaderboardService.html", "cl": 44, "ucl": 5, "cal": 49, "tl": 76, "cb": 9, "tb": 12, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Service.MoveService", "rp": "NardBackEnd_MoveService.html", "cl": 39, "ucl": 7, "cal": 46, "tl": 74, "cb": 5, "tb": 6, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Service.PokeAPIService", "rp": "NardBackEnd_PokeAPIService.html", "cl": 28, "ucl": 4, "cal": 32, "tl": 63, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Service.PokemonService", "rp": "NardBackEnd_PokemonService.html", "cl": 24, "ucl": 10, "cal": 34, "tl": 78, "cb": 3, "tb": 6, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Service.TypeService", "rp": "NardBackEnd_TypeService.html", "cl": 9, "ucl": 0, "cal": 9, "tl": 24, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
     ]},
 ];
 
@@ -255,70 +246,16 @@ var riskHotspotMetrics = [
 
 var riskHotspots = [
   {
-    "assembly": "NardBackEnd", "class": "Repository.TypeRepository", "reportPath": "NardBackEnd_TypeRepository.html", "methodName": "MakeTypeDBTable()", "methodShortName": "MakeTypeDBTable()", "fileIndex": 0, "line": 24,
-    "metrics": [
-      { "value": 84390, "exceeded": true },
-      { "value": 290, "exceeded": true },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "CalculateDamage()", "methodShortName": "CalculateDamage()", "fileIndex": 0, "line": 143,
+    "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "CalculateDamage()", "methodShortName": "CalculateDamage()", "fileIndex": 0, "line": 139,
     "metrics": [
       { "value": 3906, "exceeded": true },
       { "value": 62, "exceeded": true },
     ]},
   {
-    "assembly": "NardBackEnd", "class": "Repository.MoveRepository", "reportPath": "NardBackEnd_MoveRepository.html", "methodName": "MakeMovesTable()", "methodShortName": "MakeMovesTable()", "fileIndex": 0, "line": 21,
-    "metrics": [
-      { "value": 156, "exceeded": true },
-      { "value": 12, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "CalculatePriority(Models.Battle,System.String,System.String)", "methodShortName": "CalculatePriority(...)", "fileIndex": 0, "line": 106,
+    "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "CalculatePriority(Models.Battle,System.String,System.String)", "methodShortName": "CalculatePriority(...)", "fileIndex": 0, "line": 102,
     "metrics": [
       { "value": 72, "exceeded": true },
       { "value": 8, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.LeaderboardService", "reportPath": "NardBackEnd_LeaderboardService.html", "methodName": "UpdateLeaderboard(Models.Leaderboard,System.Int32)", "methodShortName": "UpdateLeaderboard(...)", "fileIndex": 0, "line": 31,
-    "metrics": [
-      { "value": 72, "exceeded": true },
-      { "value": 8, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Repository.PokemonRepository", "reportPath": "NardBackEnd_PokemonRepository.html", "methodName": "MakePokemonDBTable()", "methodShortName": "MakePokemonDBTable()", "fileIndex": 0, "line": 22,
-    "metrics": [
-      { "value": 42, "exceeded": true },
-      { "value": 6, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "BattleController", "reportPath": "NardBackEnd_BattleController.html", "methodName": "CreateBattle(System.Int32,System.Int32,System.String,System.String)", "methodShortName": "CreateBattle(...)", "fileIndex": 0, "line": 24,
-    "metrics": [
-      { "value": 20, "exceeded": true },
-      { "value": 4, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "UpdateBattle(Models.Battle,System.Int32,System.Boolean,System.Boolean,System.Threading.Tasks.Task`1<System.String>)", "methodShortName": "UpdateBattle(...)", "fileIndex": 0, "line": 39,
-    "metrics": [
-      { "value": 20, "exceeded": true },
-      { "value": 4, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "NormalizePokemon(Models.Battle)", "methodShortName": "NormalizePokemon(...)", "fileIndex": 0, "line": 77,
-    "metrics": [
-      { "value": 20, "exceeded": true },
-      { "value": 4, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.LeaderboardService", "reportPath": "NardBackEnd_LeaderboardService.html", "methodName": "CreateLeaderboard(Models.Leaderboard)", "methodShortName": "CreateLeaderboard(...)", "fileIndex": 0, "line": 16,
-    "metrics": [
-      { "value": 20, "exceeded": true },
-      { "value": 4, "exceeded": false },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.MoveService", "reportPath": "NardBackEnd_MoveService.html", "methodName": "GetRandomMoveSet(Models.Pokemon)", "methodShortName": "GetRandomMoveSet(...)", "fileIndex": 0, "line": 42,
-    "metrics": [
-      { "value": 20, "exceeded": true },
-      { "value": 4, "exceeded": false },
     ]},
 ];
 

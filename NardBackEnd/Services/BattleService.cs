@@ -31,12 +31,6 @@ public class BattleService:IBattleService
         _context.SaveChanges();
     }
 
-    public void UpdateBattle(Battle battle)
-    {
-        _context.Battles.Update(battle);
-        _context.SaveChanges();
-    }
-
     public string UpdateBattle (Battle battle, int firstToMove, bool move1Hit, bool move2Hit, Task<string> damageResult)
     {
         //convert move1Hit and move2Hit to strings

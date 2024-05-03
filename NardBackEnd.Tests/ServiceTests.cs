@@ -12,38 +12,6 @@ namespace NardBackEnd.Tests;
 
 public class ServiceTests
 {
-    [Fact]
-    public async void PokemonServiceShouldGetGen1()
-    {
-        Mock<IPokemonRepository> testPokeRepo = new Mock<IPokemonRepository>();
-
-        List<Pokemon> testPoke = 
-        [
-            new Pokemon
-            {
-                Id = 1,
-                Name = "bulbasaur",
-                Types = ["grass","poison"],
-                Hp = 45,
-                Atk = 49,
-                Satk = 65,
-                Def = 49,
-                Sdef = 65,
-                Spd = 45,
-                MovePool = ["cut","bind","vine-whip" ],
-                Sprite = "1.png"
-            }
-        ];
-
-        testPokeRepo.Setup(Repository => Repository.MakePokemonDBTable()).ReturnsAsync(testPoke);
-        
-        Mock<HttpClient> http = new  Mock<HttpClient>();
-        Mock<ApplicationDbContext> context = new Mock<ApplicationDbContext>();
-
-        PokemonService pokeService = new PokemonService(http.Object,context.Object,testPokeRepo.Object);
-
-        List<Pokemon> allPoke = await pokeService.MakePokemonDBTable();
-    }
 
     //SearchPokemon should take a pokemon name and return its data
     [Fact]
@@ -69,16 +37,33 @@ public class ServiceTests
             }
         ];
 
-        testPokeRepo.Setup(Repository => Repository.MakePokemonDBTable()).ReturnsAsync(testPoke);
-        
-        Mock<HttpClient> http = new  Mock<HttpClient>();
-        Mock<ApplicationDbContext> context = new Mock<ApplicationDbContext>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        .UseInMemoryDatabase(databaseName: "test")
+        .Options;
 
-        PokemonService pokeService = new PokemonService(http.Object,context.Object,testPokeRepo.Object);
+        // Use a clean instance of the context to run the test
+        using (var context = new ApplicationDbContext(options))
+        {
+            //first, we are going to make sure
+            //that the DB is in clean slate
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
 
-        Pokemon foundPoke = await pokeService.SearchPokemon("bulbasaur");
+            context.Pokemon.AddRange(testPoke);
+            context.SaveChanges();
+        }
 
-        Assert.Equal("bulbasaur", foundPoke.Name);
+        // Use a separate instance of the context to verify test results
+        using (var context = new ApplicationDbContext(options))
+        {
+            Mock<HttpClient> http = new  Mock<HttpClient>();
+
+            PokemonService pokeService = new PokemonService(http.Object, context, testPokeRepo.Object);
+
+            Pokemon foundPoke = await pokeService.SearchPokemon("bulbasaur");
+
+            Assert.Equal("bulbasaur", foundPoke.Name);
+        }
     }
 
     //GetPokemon should take a pokemon id and return its data
@@ -105,16 +90,33 @@ public class ServiceTests
             }
         ];
 
-        testPokeRepo.Setup(Repository => Repository.MakePokemonDBTable()).ReturnsAsync(testPoke);
         
-        Mock<HttpClient> http = new  Mock<HttpClient>();
-        Mock<ApplicationDbContext> context = new Mock<ApplicationDbContext>();
+        var pokeDbSetMock = new Mock<DbSet<Pokemon>>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        // Use a clean instance of the context to run the test
+        using (var context = new ApplicationDbContext(options))
+        {  
+            //first, we are going to make sure
+            //that the DB is in clean slate
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
 
-        PokemonService pokeService = new PokemonService(http.Object,context.Object,testPokeRepo.Object);
+            context.Pokemon.AddRange(testPoke);
+            context.SaveChanges();
+        }
 
-        Pokemon foundPoke = await pokeService.GetPokemon(1);
+        // Use a separate instance of the context to verify test results
+        using (var context = new ApplicationDbContext(options))
+        {
+            Mock<HttpClient> http = new  Mock<HttpClient>();
 
-        Assert.Equal("bulbasaur", foundPoke.Name);
+            PokemonService pokeService = new PokemonService(http.Object, context, testPokeRepo.Object);
+
+            Pokemon poke = await pokeService.GetPokemon(1);
+
+            Assert.True(poke != null);
+            Assert.Equal("bulbasaur", poke.Name);
+        }
     }
 
     //GetAllPokemon should return all pokemon in the database
@@ -141,16 +143,34 @@ public class ServiceTests
             }
         ];
 
-        testPokeRepo.Setup(Repository => Repository.MakePokemonDBTable()).ReturnsAsync(testPoke);
+
         
-        Mock<HttpClient> http = new  Mock<HttpClient>();
-        Mock<ApplicationDbContext> context = new Mock<ApplicationDbContext>();
+        var pokeDbSetMock = new Mock<DbSet<Pokemon>>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        // Use a clean instance of the context to run the test
+        using (var context = new ApplicationDbContext(options))
+        {      
+            //first, we are going to make sure
+            //that the DB is in clean slate
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
 
-        PokemonService pokeService = new PokemonService(http.Object,context.Object,testPokeRepo.Object);
+            context.Pokemon.AddRange(testPoke);
+            context.SaveChanges();
+        }
 
-        IEnumerable<Pokemon> allPoke = await pokeService.GetAllPokemon();
+        // Use a separate instance of the context to verify test results
+        using (var context = new ApplicationDbContext(options))
+        {
+            Mock<HttpClient> http = new  Mock<HttpClient>();
 
-        Assert.Equal("bulbasaur", allPoke.First().Name);
+            PokemonService pokeService = new PokemonService(http.Object, context, testPokeRepo.Object);
+
+            IEnumerable<Pokemon> allPoke = await pokeService.GetAllPokemon();
+
+            Assert.True(allPoke != null);
+            Assert.Equal("bulbasaur", allPoke.First().Name);
+        }
     }
 
     //PokeAPI GetPokemon should return a pokemon from the API
@@ -274,14 +294,22 @@ public class ServiceTests
             }
         ];
 
-        testMoveRepo.Setup(Repository => Repository.MakeMovesTable()).ReturnsAsync(testMove);
-
         Mock<HttpClient> http = new  Mock<HttpClient>();
-        Mock<ApplicationDbContext> context = new Mock<ApplicationDbContext>();
+        var moveDbSetMock = new Mock<DbSet<Move>>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        var context = new Mock<ApplicationDbContext>(options);
+
+        moveDbSetMock.As<IQueryable<Move>>().Setup(m => m.Provider).Returns(testMove.AsQueryable().Provider);
+        moveDbSetMock.As<IQueryable<Move>>().Setup(m => m.Expression).Returns(testMove.AsQueryable().Expression);
+        moveDbSetMock.As<IQueryable<Move>>().Setup(m => m.ElementType).Returns(testMove.AsQueryable().ElementType);
+        moveDbSetMock.As<IQueryable<Move>>().Setup(m => m.GetEnumerator()).Returns(testMove.AsQueryable().GetEnumerator());
+        
         Mock<IPokemonService> pokeService = new Mock<IPokemonService>();
 
-        MoveService moveService = new MoveService(http.Object,testMoveRepo.Object,context.Object,pokeService.Object);
+        context.Setup(c => c.Move).Returns(moveDbSetMock.Object);
 
+        MoveService moveService = new MoveService(http.Object, testMoveRepo.Object, context.Object, pokeService.Object);
+        
         List<Move> allMoves = await moveService.GetMoves();
 
         Assert.Equal("tackle", allMoves.First().Name);
@@ -372,23 +400,22 @@ public class ServiceTests
 
         Mock<HttpClient> http = new  Mock<HttpClient>();
         var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
-        // Create a mock set
-        var mockSet = new Mock<DbSet<Move>>();
-        mockSet.As<IQueryable<Move>>().Setup(m => m.Provider).Returns(testMove.AsQueryable().Provider);
-        mockSet.As<IQueryable<Move>>().Setup(m => m.Expression).Returns(testMove.AsQueryable().Expression);
-        mockSet.As<IQueryable<Move>>().Setup(m => m.ElementType).Returns(testMove.AsQueryable().ElementType);
-        mockSet.As<IQueryable<Move>>().Setup(m => m.GetEnumerator()).Returns(testMove.GetEnumerator());
+        var context = new Mock<ApplicationDbContext>(options);
+        var moveDbSet = new Mock<DbSet<Move>>();
+        // moveDbSet.Setup(m => m.FindAsync("tackle")).Returns(testMove);
 
-        // Setup the mock context
-        var mockContext = new Mock<ApplicationDbContext>(options);
-        mockContext.Setup(c => c.Move).Returns(mockSet.Object);
+        moveDbSet.As<IQueryable<Move>>().Setup(m => m.Provider).Returns(testMove.AsQueryable().Provider);
+        moveDbSet.As<IQueryable<Move>>().Setup(m => m.Expression).Returns(testMove.AsQueryable().Expression);
+        moveDbSet.As<IQueryable<Move>>().Setup(m => m.ElementType).Returns(testMove.AsQueryable().ElementType);
+        moveDbSet.As<IQueryable<Move>>().Setup(m => m.GetEnumerator()).Returns(testMove.GetEnumerator());
+        moveDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => testMove.FirstOrDefault(d => d.MoveId == (int)ids[0]));
 
+
+
+        context.Setup(c => c.Move).Returns(moveDbSet.Object);
         Mock<IPokemonService> pokeService = new Mock<IPokemonService>();
-        // Pass the mock context to the MoveService
-        MoveService moveService = new MoveService(http.Object, testMoveRepo.Object, mockContext.Object, pokeService.Object);
-        
 
-        
+        MoveService moveService = new MoveService(http.Object,testMoveRepo.Object,context.Object,pokeService.Object);
 
         Move foundMove = await moveService.GetMove(1);
 
@@ -533,5 +560,639 @@ public class ServiceTests
         string randomMoveSet =  moveService.GetRandomMoveSet(testPoke);
 
         Assert.Equal(4, randomMoveSet.Split(",").Length);
+    }
+
+    //create tests for the battle service including create battle, update battle, delete battle, 
+    //calculate priority, calculate hit, calculate damage, normalize pokemon, get battle, get battles
+
+    [Fact]
+    public void CreateBattle_ShouldAddBattleToDatabase()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+        var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
+        var pokemonRepo = new PokemonRepository(context, apiService);
+
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo);
+
+        var service = new BattleService(context, pokemonService, httpClient);
+
+        var battle = new Battle 
+                {
+                    BattleId = 1,
+                    PokemonId1 = 1,
+                    P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                    PokemonId2 = 2,
+                    P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                    BattleWinner = Battle.Winner.NotFinished,
+                    BattleStatus = Battle.Status.InProgress,
+                    battlePhase = Battle.BattlePhase.Selection,
+                    P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+                    P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+                };
+
+        // Act
+        service.CreateBattle(battle);
+        var addedBattle = context.Battles.Find(battle.BattleId);
+
+        // Assert
+        Assert.Equal(battle, addedBattle);
+    }
+
+    [Fact]
+    public async Task UpdateBattle_ShouldUpdateBattleAndReturnRoundResult()
+    {
+    // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+        var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
+        var pokemonRepo = new PokemonRepository(context, apiService);
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
+        var service = new BattleService(context, pokemonService, httpClient);
+
+
+        var battle = new Battle 
+                    {
+                        BattleId = 1,
+                        PokemonId1 = 1,
+                        P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                        PokemonId2 = 2,
+                        P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                        BattleWinner = Battle.Winner.NotFinished,
+                        BattleStatus = Battle.Status.InProgress,
+                        battlePhase = Battle.BattlePhase.Selection,
+                        P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+                        P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+                    };
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+        context.Battles.Add(battle);
+        context.SaveChanges();
+
+        int firstToMove = 1;
+        bool move1Hit = true;
+        bool move2Hit = false;
+        Task<string> damageResult = Task.FromResult("10");
+
+        // Act
+        string result = service.UpdateBattle(battle, firstToMove, move1Hit, move2Hit, damageResult);
+
+        // Assert
+        Assert.Equal("1hitmiss10", result);
+
+        var updatedBattle = context.Battles.Find(battle.BattleId);
+        Assert.Equal(new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" }, updatedBattle.P1StatBlock);
+        Assert.Equal(new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" }, updatedBattle.P2StatBlock);
+    }
+
+    [Fact]
+    public void DeleteBattle_ShouldDeleteBattle()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+        var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
+        var pokemonRepo = new PokemonRepository(context, apiService);
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
+        var service = new BattleService(context, pokemonService, httpClient);
+
+        var battle = new Battle 
+            {
+                BattleId = 1,
+                PokemonId1 = 1,
+                P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                PokemonId2 = 2,
+                P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                BattleWinner = Battle.Winner.NotFinished,
+                BattleStatus = Battle.Status.InProgress,
+                battlePhase = Battle.BattlePhase.Selection,
+                P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+                P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+            };
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+        context.Battles.Add(battle);
+        context.SaveChanges();
+
+        // Act
+        service.DeleteBattle(battle.BattleId);
+
+        // Assert
+        var deletedBattle = context.Battles.Find(battle.BattleId);
+        Assert.Null(deletedBattle);
+    }
+
+    [Fact]
+    public void CalculatePriority_ShouldReturnCorrectPriority()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+        var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
+        var pokemonRepo = new PokemonRepository(context, apiService);
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
+        var service = new BattleService(context, pokemonService, httpClient);
+
+        var move1 = new Move { MoveId = 1, Name = "move1", Priority = 1, Power = 40, Acc = 100, Pp = 35, Type = "normal", DamageClass = "physical"};
+        var move2 = new Move { MoveId = 2, Name = "move2", Priority = 2, Power = 40, Acc = 100, Pp = 35, Type = "normal", DamageClass = "physical"};
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+        context.Move.Add(move1);
+        context.Move.Add(move2);
+        context.SaveChanges();
+
+        var battle = new Battle 
+            {
+                BattleId = 1,
+                PokemonId1 = 1,
+                P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                PokemonId2 = 2,
+                P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                BattleWinner = Battle.Winner.NotFinished,
+                BattleStatus = Battle.Status.InProgress,
+                battlePhase = Battle.BattlePhase.Selection,
+                P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+                P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+            };
+    
+        context.Battles.Add(battle);
+        context.SaveChanges();
+
+        // Act
+        int result = service.CalculatePriority(battle, move1.Name, move2.Name);
+
+        // Assert
+        Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public void CalculateHit_ShouldReturnCorrectResult()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+        var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
+        var pokemonRepo = new PokemonRepository(context, apiService); // Assuming you have a PokemonRepository class
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
+        var service = new BattleService(context, pokemonService, httpClient);
+
+        var move1 = new Move { MoveId = 1, Name = "move1", Acc = 100, Power = 40, Type = "normal", DamageClass = "physical"};
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+        context.Move.Add(move1);
+        context.SaveChanges();
+
+        var battle = new Battle 
+        {
+            BattleId = 1,
+            PokemonId1 = 1,
+            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            PokemonId2 = 2,
+            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            BattleWinner = Battle.Winner.NotFinished,
+            BattleStatus = Battle.Status.InProgress,
+            battlePhase = Battle.BattlePhase.Selection,
+            P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+            P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+        };
+        context.Battles.Add(battle);
+        context.SaveChanges();
+
+        // Act
+        bool result = service.CalculateHit(battle, move1.Name);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+public async Task CalculateDamageTest()
+{
+    // Arrange
+    var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        .UseInMemoryDatabase(databaseName: "test")
+        .Options;
+    var context = new ApplicationDbContext(options);
+
+    var httpClient = new HttpClient();
+    var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
+    var pokemonRepo = new PokemonRepository(context, apiService); // Assuming you have a PokemonRepository class
+    var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
+    var service = new BattleService(context, pokemonService, httpClient);
+
+    var serviceMock = new Mock<BattleService>(context, pokemonService, httpClient);
+    serviceMock.Setup(s => s.GetMultiplier(It.IsAny<Move>(), It.IsAny<Pokemon>())).ReturnsAsync(1.0);
+
+    var service = serviceMock.Object;
+
+    //create two moves in the database
+    var move1 = new Move { MoveId = 1, Name = "tackle", Power = 40, Acc = 100, Type = "normal", DamageClass = "physical"};
+    var move2 = new Move { MoveId = 2, Name = "growl", Power = 0, Acc = 100, Type = "normal", DamageClass = "status"};
+
+    //create two pokemon in the database
+    var pokemon1 = new Pokemon { Id = 1, Name = "bulbasaur", Types = new List<string> { "grass", "poison" }, Hp = 45, Atk = 49, Satk = 65, Def = 49, Sdef = 65, Spd = 45, MovePool = new List<string> { "tackle", "scratch", "ember", "water-gun" }, Sprite = "1.png" };
+    var pokemon2 = new Pokemon { Id = 3, Name = "venusaur", Types = new List<string> { "grass", "poison" }, Hp = 80, Atk = 82, Satk = 100, Def = 83, Sdef = 100, Spd = 80, MovePool = new List<string> { "tackle", "scratch", "ember", "water-gun" }, Sprite = "3.png" };
+
+    // set up a return for service.get multiplier
+    service.Setup(s => s.GetMultiplier(It.IsAny<Move>(), It.IsAny<Pokemon>())).ReturnsAsync(1.0);
+
+
+    context.Database.EnsureDeleted();
+    context.Database.EnsureCreated();
+    context.Move.Add(move1);
+    context.Move.Add(move2);
+    context.Pokemon.Add(pokemon1);
+    context.Pokemon.Add(pokemon2);
+    context.SaveChanges();
+    
+    var battle = new Battle 
+        {
+            BattleId = 1,
+            PokemonId1 = 1,
+            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            PokemonId2 = 3,
+            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            BattleWinner = Battle.Winner.NotFinished,
+            BattleStatus = Battle.Status.InProgress,
+            battlePhase = Battle.BattlePhase.Selection,
+            P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+            P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+        };
+    string pokemon1Move = "tackle"; // Changed to lowercase
+    string pokemon2Move = "growl"; // Changed to lowercase
+
+    // Act
+    var result = await service.CalculateDamage(battle, pokemon1Move, pokemon2Move);
+
+    // Assert
+    var resultObject = JsonSerializer.Deserialize<dynamic>(result);
+    Assert.NotNull(resultObject);
+    Assert.Equal(1, (int)resultObject.Priority);
+    Assert.True((bool)resultObject.Move1Hit);
+    Assert.True((bool)resultObject.Move2Hit);
+    Assert.True((int)resultObject.P1HP > 0);
+    Assert.True((int)resultObject.P2HP > 0);
+}
+
+    [Fact]
+    public void BattleServiceShouldNormalizePokemon()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        var context = new Mock<ApplicationDbContext>(options);
+        context.Setup(c => c.Pokemon.Find(1)).Returns(new Pokemon { Id = 1, Name = "bulbasaur", Types = new List<string> { "grass", "poison" }, Hp = 45, Atk = 49, Satk = 65, Def = 49, Sdef = 65, Spd = 45, MovePool = new List<string> { "cut", "bind", "vine-whip", "scratch" }, Sprite = "1.png" });
+        context.Setup(c => c.Pokemon.Find(2)).Returns(new Pokemon { Id = 2, Name = "venusaur", Types = new List<string> { "grass", "poison" }, Hp = 80, Atk = 82, Satk = 100, Def = 83, Sdef = 100, Spd = 80, MovePool = new List<string> { "cut", "bind", "vine-whip", "scratch" }, Sprite = "3.png" });
+
+        var pokemonService = new Mock<IPokemonService>();
+        var httpClient = new HttpClient();
+
+        var service = new BattleService(context.Object, pokemonService.Object, httpClient);
+        var battle = new Battle
+        {
+            BattleId = 1,
+            PokemonId1 = 1,
+            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            PokemonId2 = 2,
+            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            BattleWinner = Battle.Winner.NotFinished,
+            BattleStatus = Battle.Status.InProgress,
+            battlePhase = Battle.BattlePhase.Selection,
+            P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+            P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+        };
+
+        // Act
+        var normalizedBattle = service.NormalizePokemon(battle);
+
+        // Assert
+        Assert.NotEqual("hp:0", normalizedBattle.P1StatBlock[0]);
+        Assert.NotEqual("hp:0", normalizedBattle.P2StatBlock[0]);
+    }
+
+    [Fact]
+    public async void BattleServiceShouldGetBattle()
+    {
+        List<Battle> testBattle = 
+        [
+            new Battle
+            {
+                BattleId = 1,
+                PokemonId1 = 1,
+                P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                PokemonId2 = 2,
+                P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                BattleWinner = Battle.Winner.NotFinished,
+                BattleStatus = Battle.Status.InProgress,
+                battlePhase = Battle.BattlePhase.Selection,
+                P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+                P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+            }
+        ];
+
+        Mock<HttpClient> http = new  Mock<HttpClient>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        var context = new Mock<ApplicationDbContext>(options);
+        var battleDbSet = new Mock<DbSet<Battle>>();
+        
+        // mock up a pokemon service
+        Mock<IPokemonService> pokemonService = new Mock<IPokemonService>();
+
+
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.Provider).Returns(testBattle.AsQueryable().Provider);
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.Expression).Returns(testBattle.AsQueryable().Expression);
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.ElementType).Returns(testBattle.AsQueryable().ElementType);
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.GetEnumerator()).Returns(testBattle.GetEnumerator());
+
+        context.Setup(c => c.Battles).Returns(battleDbSet.Object);
+
+        var mockBattleService = new Mock<IBattleService>();
+
+        mockBattleService.Setup(service => service.CreateBattle(It.IsAny<Battle>()))
+            .Callback<Battle>(battle => testBattle.Add(battle));
+        
+        mockBattleService.Setup(service => service.GetBattle(It.IsAny<int>()))
+        .Returns<int>(id => testBattle.FirstOrDefault(battle => battle.BattleId == id));
+
+        IBattleService battleService = mockBattleService.Object;
+
+        Battle newBattle = new Battle
+        {
+            BattleId = 2,
+            PokemonId1 = 1,
+            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            PokemonId2 = 2,
+            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            BattleWinner = Battle.Winner.NotFinished,
+            BattleStatus = Battle.Status.InProgress,
+            battlePhase = Battle.BattlePhase.Selection,
+            P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+            P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+        };
+
+        battleService.CreateBattle(newBattle);
+
+        Battle foundBattle = battleService.GetBattle(2);
+
+        Assert.Equal(2, foundBattle.BattleId);
+    }
+
+    [Fact]
+    public async void BattleServiceShouldGetBattles()
+    {
+        List<Battle> testBattle = 
+        [
+            new Battle
+            {
+                BattleId = 1,
+                PokemonId1 = 1,
+                P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                PokemonId2 = 2,
+                P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                BattleWinner = Battle.Winner.NotFinished,
+                BattleStatus = Battle.Status.InProgress,
+                battlePhase = Battle.BattlePhase.Selection,
+                P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+                P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+            }
+        ];
+
+        Mock<HttpClient> http = new  Mock<HttpClient>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        var context = new Mock<ApplicationDbContext>(options);
+        var battleDbSet = new Mock<DbSet<Battle>>();
+        
+        // mock up a pokemon service
+        Mock<IPokemonService> pokemonService = new Mock<IPokemonService>();
+
+
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.Provider).Returns(testBattle.AsQueryable().Provider);
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.Expression).Returns(testBattle.AsQueryable().Expression);
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.ElementType).Returns(testBattle.AsQueryable().ElementType);
+        battleDbSet.As<IQueryable<Battle>>().Setup(m => m.GetEnumerator()).Returns(testBattle.GetEnumerator());
+
+        context.Setup(c => c.Battles).Returns(battleDbSet.Object);
+
+        var mockBattleService = new Mock<IBattleService>();
+
+        mockBattleService.Setup(service => service.CreateBattle(It.IsAny<Battle>()))
+            .Callback<Battle>(battle => testBattle.Add(battle));
+        
+        mockBattleService.Setup(service => service.GetBattles())
+        .Returns(testBattle);
+
+        IBattleService battleService = mockBattleService.Object;
+
+        Battle newBattle = new Battle
+        {
+            BattleId = 2,
+            PokemonId1 = 1,
+            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            PokemonId2 = 2,
+            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            BattleWinner = Battle.Winner.NotFinished,
+            BattleStatus = Battle.Status.InProgress,
+            battlePhase = Battle.BattlePhase.Selection,
+            P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+            P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+        };
+
+        battleService.CreateBattle(newBattle);
+
+        List<Battle> foundBattles = battleService.GetBattles();
+
+        Assert.Equal(2, foundBattles.Count);
+
+    }
+
+// create tests for MakeTypeDbTable
+    [Fact]
+    public async Task MakeTypeDBTable_ShouldReturnCorrectList()
+    {
+        // Arrange
+        var mockTypeRepository = new Mock<ITypeRepository>();
+        var expectedList = new List<Models.Type> { new Models.Type { Id = 1, Name = "Fire" }, new Models.Type { Id = 2, Name = "Water" } };
+        mockTypeRepository.Setup(repo => repo.MakeTypeDBTable()).ReturnsAsync(expectedList);
+
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
+        var context = new ApplicationDbContext(options);
+        var httpClient = new HttpClient();
+
+        var service = new TypeService(mockTypeRepository.Object, context, httpClient);
+
+        // Act
+        var result = await service.MakeTypeDBTable();
+
+        // Assert
+        Assert.Equal(expectedList, result);
+    }
+
+    // create testsfor CreateLeaderboard, UpdateLeaderboard, DeleteLeaderboard, GetLeaderboard, GetLeaderboards
+    [Fact]
+    public void CreateLeaderboard_ShouldAddNewLeaderboard()
+    {
+        // Arrange
+        var mockSet = new Mock<DbSet<Leaderboard>>();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var mockContext = new ApplicationDbContext(options);
+        mockSet.Setup(m => m.Add(It.IsAny<Leaderboard>())).Callback<Leaderboard>(arg => mockContext.Leaderboards.Add(arg));
+
+        var httpClient = new HttpClient();
+
+        var service = new LeaderboardService(httpClient, mockContext);
+
+        var newLeaderboard = new Leaderboard { PokemonId = 3, PokemonName = "Test Pokemon" };
+
+        // Act
+        service.CreateLeaderboard(newLeaderboard);
+
+        // Assert
+        Assert.Contains(newLeaderboard, mockContext.Leaderboards);
+    }
+    [Fact]
+    public void UpdateLeaderboard_ShouldUpdateLeaderboardCorrectly()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+
+        var service = new LeaderboardService(httpClient, context);
+
+        var leaderboard = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon", Win = 5, Loss = 2 };
+        context.Leaderboards.Add(leaderboard);
+        context.SaveChanges();
+
+        // Act
+        service.UpdateLeaderboard(leaderboard, 3); // Win should be updated to 8
+        var updatedLeaderboard = context.Leaderboards.Find(leaderboard.Id);
+
+        // Assert
+        Assert.Equal(8, updatedLeaderboard.Win);
+
+        // Act
+        service.UpdateLeaderboard(leaderboard, -2); // Loss should be updated to 4
+        updatedLeaderboard = context.Leaderboards.Find(leaderboard.Id);
+
+        // Assert
+        Assert.Equal(4, updatedLeaderboard.Loss);
+
+        // Act
+        var newLeaderboard = new Leaderboard { Id = 2, PokemonId = 4, PokemonName = "New Pokemon" };
+        service.UpdateLeaderboard(newLeaderboard, 2); // New leaderboard should be added with Win = 2
+        var addedLeaderboard = context.Leaderboards.Find(newLeaderboard.Id);
+
+        // Assert
+        Assert.Equal(2, addedLeaderboard.Win);
+    }
+
+    [Fact]
+    public void DeleteLeaderboard_ShouldDeleteLeaderboardCorrectly()
+{
+    // Arrange
+    var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        .UseInMemoryDatabase(databaseName: "test")
+        .Options;
+    var context = new ApplicationDbContext(options);
+
+    var httpClient = new HttpClient();
+
+    var service = new LeaderboardService(httpClient, context);
+
+    var leaderboard = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon", Win = 5, Loss = 2 };
+    
+    //first, we are going to make sure
+    //that the DB is in clean slate
+    context.Database.EnsureDeleted();
+    context.Database.EnsureCreated();
+    context.Leaderboards.Add(leaderboard);
+    context.SaveChanges();
+
+    // Act
+    service.DeleteLeaderboard(leaderboard.Id);
+    var deletedLeaderboard = context.Leaderboards.Find(leaderboard.Id);
+
+    // Assert
+    Assert.Null(deletedLeaderboard);
+}
+
+    [Fact]
+    public void GetLeaderboard_ShouldReturnCorrectLeaderboard()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+
+        var service = new LeaderboardService(httpClient, context);
+
+        var leaderboard = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon", Win = 5, Loss = 2 };
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+        context.Leaderboards.Add(leaderboard);
+        context.SaveChanges();
+
+        // Act
+        var retrievedLeaderboard = service.GetLeaderboard(leaderboard.Id);
+
+        // Assert
+        Assert.Equal(leaderboard, retrievedLeaderboard);
+    }
+
+    [Fact]
+    public void GetLeaderboards_ShouldReturnLeaderboardsInCorrectOrder()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+        var context = new ApplicationDbContext(options);
+
+        var httpClient = new HttpClient();
+
+        var service = new LeaderboardService(httpClient, context);
+
+        var leaderboard1 = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon 1", Win = 5, Loss = 2, Rank = 2 };
+        var leaderboard2 = new Leaderboard { Id = 2, PokemonId = 4, PokemonName = "Test Pokemon 2", Win = 6, Loss = 1, Rank = 1 };
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+        context.Leaderboards.AddRange(new[] { leaderboard1, leaderboard2 });
+        context.SaveChanges();
+
+        // Act
+        var leaderboards = service.GetLeaderboards();
+
+        // Assert
+        Assert.Equal(2, leaderboards.Count);
+        Assert.Equal(leaderboard2, leaderboards[0]);
+        Assert.Equal(leaderboard1, leaderboards[1]);
     }
 }
