@@ -178,7 +178,11 @@ public class BattleService:IBattleService
         {
             p2Type2 = _context.Pokemon.Find(battle.PokemonId2)?.Types[1];
         }
-
+        
+        var priority = CalculatePriority(battle, pokemon1Move, pokemon2Move);
+        var move1Hit = CalculateHit(battle, pokemon1Move);
+        var move2Hit = CalculateHit(battle, pokemon2Move);
+        
         // Get the STAB multiplier
         float STAB = 1;
         float STAB2 = 1;
@@ -203,15 +207,13 @@ public class BattleService:IBattleService
         float? damage2 = ((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand;
 
         // Update the defender's HP
-        p1Stats["hp"] -= (int)damage2;
-        p2Stats["hp"] -= (int)damage;
+        p1Stats["hp"] -= move2Hit?(int)damage2:0;
+        p2Stats["hp"] -= move1Hit?(int)damage:0;
 
-        var priority = CalculatePriority(battle, pokemon1Move, pokemon2Move);
-        var move1Hit = CalculateHit(battle, pokemon1Move);
-        var move2Hit = CalculateHit(battle, pokemon2Move);
+
 
         // Return the result
-        //string fullString = $"{p1.Name} dealt {damage} damage to {p2.Name}. It was {TMultiplier}x\'s effective. {p2.Name} has {p2Stats["hp"]} HP remaining. {p2.Name} dealt {damage2} damage to {p1.Name}. It was {TMultiplier2}x\'s effective. {p1.Name} has {p1Stats["hp"]} HP remaining.";
+        string fullString = $"{p1.Name}\'s {move1.Name} dealt {damage} damage to {p2.Name}. It was {TMultiplier}x\'s effective. {p2.Name} has {p2Stats["hp"]} HP remaining. {p2.Name}\'s {move2.Name} dealt {damage2} damage to {p1.Name}. It was {TMultiplier2}x\'s effective. {p1.Name} has {p1Stats["hp"]} HP remaining.";
         // create a json object to return who has priority, whether the attack has landed, and the remaining hp of each pokemon
         // var jsonObject = JsonSerializer.Serialize(new {Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"]});
         //string fullString = $"move 1 Power is {move1.Power}, attacker attack is {attackerAtk}, defender defense is {defenderDef}, STAB is {STAB}, TMultiplier is {TMultiplier}, rand is {rand}, damage is {damage}, defender HP is {p2Stats["hp"]}, move 2 Power is {move2.Power}, attacker attack is {attackerAtk2}, defender defense is {defenderDef2}, STAB is {STAB2}, TMultiplier is {TMultiplier2}, rand is {rand}, damage is {damage2}, defender HP is {p1Stats["hp"]}";
@@ -220,7 +222,7 @@ public class BattleService:IBattleService
         //string fullString = $"p2 type 1 is {p2.Types[0]}, move1 type is {move1.Type}, p2 Types count is {p2.Types.Count}";
         //Task<string> result = Task.FromResult(fullString);
 
-        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\" = {move1Hit}, \"Move2Hit\" = {move2Hit}, \"P1HP\" = {p1Stats["hp"]}, \"P2HP\" = {p2Stats["hp"]}}}";
+        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\" = {move1Hit}, \"Move2Hit\" = {move2Hit}, \"P1HP\" = {p1Stats["hp"]}, \"P2HP\" = {p2Stats["hp"]}, \"Summary\" = {fullString}}}";
         // var jsonObject = JsonSerializer.Serialize(new { Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"] });
         if (jsonObject == null) {
             throw new InvalidOperationException("Failed to serialize the battle results.");
