@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Models;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Service;
 
@@ -16,6 +17,7 @@ public interface IBattleService
     Battle NormalizePokemon(Battle battle);
     Battle GetBattle(int battleId);
     List<Battle> GetBattles();
+    float GetTypeMultiplier(Move move, Pokemon pokemon);
 
 }
 

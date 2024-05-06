@@ -226,7 +226,7 @@ var assemblies = [
       { "name": "Models.Move", "rp": "NardBackEnd_Move.html", "cl": 9, "ucl": 0, "cal": 9, "tl": 16, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Models.Pokemon", "rp": "NardBackEnd_Pokemon.html", "cl": 11, "ucl": 0, "cal": 11, "tl": 28, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Models.Type", "rp": "NardBackEnd_Type.html", "cl": 21, "ucl": 1, "cal": 22, "tl": 32, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Service.BattleService", "rp": "NardBackEnd_BattleService.html", "cl": 55, "ucl": 133, "cal": 188, "tl": 302, "cb": 6, "tb": 80, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Service.BattleService", "rp": "NardBackEnd_BattleService.html", "cl": 180, "ucl": 9, "cal": 189, "tl": 309, "cb": 47, "tb": 82, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Service.LeaderboardService", "rp": "NardBackEnd_LeaderboardService.html", "cl": 44, "ucl": 5, "cal": 49, "tl": 76, "cb": 9, "tb": 12, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Service.MoveService", "rp": "NardBackEnd_MoveService.html", "cl": 39, "ucl": 7, "cal": 46, "tl": 74, "cb": 5, "tb": 6, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Service.PokeAPIService", "rp": "NardBackEnd_PokeAPIService.html", "cl": 28, "ucl": 4, "cal": 32, "tl": 63, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
@@ -248,14 +248,8 @@ var riskHotspots = [
   {
     "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "CalculateDamage()", "methodShortName": "CalculateDamage()", "fileIndex": 0, "line": 139,
     "metrics": [
-      { "value": 3906, "exceeded": true },
-      { "value": 62, "exceeded": true },
-    ]},
-  {
-    "assembly": "NardBackEnd", "class": "Service.BattleService", "reportPath": "NardBackEnd_BattleService.html", "methodName": "CalculatePriority(Models.Battle,System.String,System.String)", "methodShortName": "CalculatePriority(...)", "fileIndex": 0, "line": 102,
-    "metrics": [
-      { "value": 72, "exceeded": true },
-      { "value": 8, "exceeded": false },
+      { "value": 76.72, "exceeded": true },
+      { "value": 64, "exceeded": true },
     ]},
 ];
 
