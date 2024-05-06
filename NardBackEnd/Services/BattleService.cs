@@ -222,7 +222,7 @@ public class BattleService:IBattleService
         //string fullString = $"p2 type 1 is {p2.Types[0]}, move1 type is {move1.Type}, p2 Types count is {p2.Types.Count}";
         //Task<string> result = Task.FromResult(fullString);
 
-        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\" = {move1Hit}, \"Move2Hit\" = {move2Hit}, \"P1HP\" = {p1Stats["hp"]}, \"P2HP\" = {p2Stats["hp"]}, \"Summary\" = {fullString}}}";
+        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\": {move1Hit}, \"Move2Hit\": {move2Hit}, \"P1HP\": {p1Stats["hp"]}, \"P2HP\": {p2Stats["hp"]}, \"Summary\": {fullString}}}";
         // var jsonObject = JsonSerializer.Serialize(new { Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"] });
         if (jsonObject == null) {
             throw new InvalidOperationException("Failed to serialize the battle results.");
