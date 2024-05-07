@@ -24,52 +24,57 @@ public class BattleController : ControllerBase
     [HttpPost ("createBattle/{pokemon1Name}/{pokemonId2}/{moves1string}/{moves2string}")]
     public async Task<IActionResult> CreateBattle(string pokemon1Name, int pokemonId2, string moves1string, string moves2string)
     {
-
-        List<string> moves1 = new List<string>(moves1string.Split(","));
-        List<string> moves2 = new List<string>(moves2string.Split(","));
-
         Pokemon pokemon1 = await _pokemonService.SearchPokemon(pokemon1Name);
 
-        // Create a battle instance
-        Battle battle = new Battle
-        {
-            PokemonId1 = pokemon1.Id,
-            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
-            PokemonId2 = pokemonId2,
-            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
-            BattleWinner = Battle.Winner.NotFinished,
-            BattleStatus = Battle.Status.InProgress,
-            battlePhase = Battle.BattlePhase.Selection,
-            P1Moves = moves1,
-            P2Moves = moves2
-        };
+        if (pokemon1!=null){
 
-        // Normalize the pokemon to level 50 stats
-        // TODO: Implement the logic to normalize the pokemon
-        battle = _battleService.NormalizePokemon(battle);
+            List<string> moves1 = new List<string>(moves1string.Split(","));
+            List<string> moves2 = new List<string>(moves2string.Split(","));
 
-        // Persist the battle
-        _battleService.CreateBattle(battle);
-        //create a string builder and loop through the p1statblock to create a string of stats
-        StringBuilder sb = new StringBuilder();
-        foreach (string stat in battle.P1StatBlock)
-        {
-            sb.Append(stat);
-            sb.Append(", ");
+            // Create a battle instance
+            Battle battle = new Battle
+            {
+                PokemonId1 = pokemon1.Id,
+                P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                PokemonId2 = pokemonId2,
+                P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+                BattleWinner = Battle.Winner.NotFinished,
+                BattleStatus = Battle.Status.InProgress,
+                battlePhase = Battle.BattlePhase.Selection,
+                P1Moves = moves1,
+                P2Moves = moves2
+            };
+
+            // Normalize the pokemon to level 50 stats
+            // TODO: Implement the logic to normalize the pokemon
+            battle = _battleService.NormalizePokemon(battle);
+
+            // Persist the battle
+            _battleService.CreateBattle(battle);
+            //create a string builder and loop through the p1statblock to create a string of stats
+            StringBuilder sb = new StringBuilder();
+            foreach (string stat in battle.P1StatBlock)
+            {
+                sb.Append(stat);
+                sb.Append(", ");
+            }
+            StringBuilder sb2 = new StringBuilder();
+            foreach (string stat in battle.P2StatBlock)
+            {
+                sb2.Append(stat);
+                sb2.Append(", ");
+            }
+            sb.Remove(sb.Length - 2, 2);
+            sb2.Remove(sb2.Length - 2, 2);
+            string sbString = sb.ToString();
+            string sbString2 = sb2.ToString();
+            string concatInfo = $"Battle id {battle.BattleId}, Pokemon 1 stat block is {sbString}, Pokemon 2 stat block is {sbString2}";
+
+            return Ok(battle);
+        } else {
+            return BadRequest($"{pokemon1Name} not found");
         }
-        StringBuilder sb2 = new StringBuilder();
-        foreach (string stat in battle.P2StatBlock)
-        {
-            sb2.Append(stat);
-            sb2.Append(", ");
-        }
-        sb.Remove(sb.Length - 2, 2);
-        sb2.Remove(sb2.Length - 2, 2);
-        string sbString = sb.ToString();
-        string sbString2 = sb2.ToString();
-        string concatInfo = $"Battle id {battle.BattleId}, Pokemon 1 stat block is {sbString}, Pokemon 2 stat block is {sbString2}";
 
-        return Ok(battle);
     }
 
     [HttpPut ("updateBattle/{battleId}/{pokemon1Move}/{pokemon2Move}")]
@@ -81,28 +86,52 @@ public class BattleController : ControllerBase
         // Get the battle from the database
         Battle battle = _battleService.GetBattle(battleId);
 
-        // Update the battle with the results of using the selected moves as they impact pokemon health.
-        int firstToMove = _battleService.CalculatePriority(battle, pokemon1Move, pokemon2Move);
-        bool move1Hit = _battleService.CalculateHit(battle, pokemon1Move);
-        bool move2Hit = _battleService.CalculateHit(battle, pokemon2Move);
-        Task<string> damageResult = _battleService.CalculateDamage(battle, pokemon1Move, pokemon2Move);
-        string returnInfo = _battleService.UpdateBattle(battle, firstToMove, move1Hit, move2Hit, damageResult);
+        //validate that the battle exists, else return Bad Request
+        if (battle!=null)
+        {
+            //validate received moves associated with battle and return Bad Request if not
+            if (battle.P1Moves.Contains(pokemon1Move))
+            {
+                if(battle.P2Moves.Contains(pokemon2Move)){
+                // Update the battle with the results of using the selected moves as they impact pokemon health.
+                int firstToMove = _battleService.CalculatePriority(battle, pokemon1Move, pokemon2Move);
+                bool move1Hit = _battleService.CalculateHit(battle, pokemon1Move);
+                bool move2Hit = _battleService.CalculateHit(battle, pokemon2Move);
+                Task<string> damageResult = _battleService.CalculateDamage(battle, pokemon1Move, pokemon2Move);
+                string returnInfo = _battleService.UpdateBattle(battle, firstToMove, move1Hit, move2Hit, damageResult);
 
-        return Ok(returnInfo);
+                return Ok((returnInfo));
+                } else {
+                    return BadRequest($"Move {pokemon2Move} not associated with this battle.");
+                }
+            } else {
+                return BadRequest($"Move {pokemon1Move} not associated with this battle.");
+            }            
+        } else {
+            return BadRequest($"BattleId {battleId} does not exist in database.");
+        }
+
     }
 
     [HttpDelete ("deleteBattle/{battleId}")]
     public IActionResult DeleteBattle(int battleId)
     {
+
         _battleService.DeleteBattle(battleId);
-        return Ok();
+        return Ok($"Battle {battleId} removed.");
+        
     }
 
     [HttpGet ("getBattle/{battleId}")]
     public IActionResult GetBattle(int battleId)
     {
         var battle = _battleService.GetBattle(battleId);
-        return Ok(JsonSerializer.Serialize(battle));
+        if (battle!=null)
+        {
+           return Ok(JsonSerializer.Serialize(battle));
+        } else {
+            return BadRequest($"Battle {battleId} does not exist in the database.");
+        }
     }
 
     [HttpGet ("getBattles")]

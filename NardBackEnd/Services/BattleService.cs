@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Globalization;
+
 
 
 
@@ -178,7 +180,11 @@ public class BattleService:IBattleService
         {
             p2Type2 = _context.Pokemon.Find(battle.PokemonId2)?.Types[1];
         }
-
+        
+        var priority = CalculatePriority(battle, pokemon1Move, pokemon2Move);
+        var move1Hit = CalculateHit(battle, pokemon1Move);
+        var move2Hit = CalculateHit(battle, pokemon2Move);
+        
         // Get the STAB multiplier
         float STAB = 1;
         float STAB2 = 1;
@@ -199,28 +205,19 @@ public class BattleService:IBattleService
         float rand = new Random().Next(217, 255)/255.0f;
 
         // Calculate the damage
-        float? damage = ((22 * move1.Power * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand;
-        float? damage2 = ((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand;
+        float? damage = move1Hit?((22 * move1.Power * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand:0;
+        float? damage2 = move2Hit?((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand:0;
+
 
         // Update the defender's HP
         p1Stats["hp"] -= (int)damage2;
         p2Stats["hp"] -= (int)damage;
 
-        var priority = CalculatePriority(battle, pokemon1Move, pokemon2Move);
-        var move1Hit = CalculateHit(battle, pokemon1Move);
-        var move2Hit = CalculateHit(battle, pokemon2Move);
+
 
         // Return the result
-        //string fullString = $"{p1.Name} dealt {damage} damage to {p2.Name}. It was {TMultiplier}x\'s effective. {p2.Name} has {p2Stats["hp"]} HP remaining. {p2.Name} dealt {damage2} damage to {p1.Name}. It was {TMultiplier2}x\'s effective. {p1.Name} has {p1Stats["hp"]} HP remaining.";
-        // create a json object to return who has priority, whether the attack has landed, and the remaining hp of each pokemon
-        // var jsonObject = JsonSerializer.Serialize(new {Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"]});
-        //string fullString = $"move 1 Power is {move1.Power}, attacker attack is {attackerAtk}, defender defense is {defenderDef}, STAB is {STAB}, TMultiplier is {TMultiplier}, rand is {rand}, damage is {damage}, defender HP is {p2Stats["hp"]}, move 2 Power is {move2.Power}, attacker attack is {attackerAtk2}, defender defense is {defenderDef2}, STAB is {STAB2}, TMultiplier is {TMultiplier2}, rand is {rand}, damage is {damage2}, defender HP is {p1Stats["hp"]}";
-        //string fullString = $"attackerAtk over defenderDef is {(attackerAtk/defenderDef)}";
-        // string fullString = $"move1 Type is {move1.Type}, move2 Type is {move2.Type}, TMultiplier is {TMultiplier}, TMultiplier2 is {TMultiplier2}, p1 types are {p1Type1} and {p1Type2}, p2 types are {p2Type1} and {p2Type2}";
-        //string fullString = $"p2 type 1 is {p2.Types[0]}, move1 type is {move1.Type}, p2 Types count is {p2.Types.Count}";
-        //Task<string> result = Task.FromResult(fullString);
-
-        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\" = {move1Hit}, \"Move2Hit\" = {move2Hit}, \"P1HP\" = {p1Stats["hp"]}, \"P2HP\" = {p2Stats["hp"]}}}";
+        string fullString = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} used {move1.Name}. It was {TMultiplier}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} dealt {MathF.Round(damage.Value)} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)}. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} used {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(move2.Name)}. It was {TMultiplier2}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} dealt {MathF.Round(damage2.Value)} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)}.";
+        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\": {move1Hit}, \"Move2Hit\": {move2Hit}, \"P1HP\": {p1Stats["hp"]}, \"P2HP\": {p2Stats["hp"]}, \"Summary\": \"{fullString}\"}}";
         // var jsonObject = JsonSerializer.Serialize(new { Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"] });
         if (jsonObject == null) {
             throw new InvalidOperationException("Failed to serialize the battle results.");
@@ -232,57 +229,60 @@ public class BattleService:IBattleService
 
     public float GetTypeMultiplier(Move move, Pokemon pokemon)
     {
-        float m1 =  _context.Types
-                .Where(t => t.Name == move.Type)
-                .Select(t => pokemon.Types[0] == "bug"?t.Bug:
-                             pokemon.Types[0] == "dark"?t.Dark:
-                             pokemon.Types[0] == "dragon"?t.Dragon:
-                             pokemon.Types[0] == "electric"?t.Electric:
-                             pokemon.Types[0] == "fairy"?t.Fairy:
-                             pokemon.Types[0] == "fighting"?t.Fighting:
-                             pokemon.Types[0] == "fire"?t.Fire:
-                             pokemon.Types[0] == "ghost"?t.Ghost:
-                             pokemon.Types[0] == "grass"?t.Grass:
-                             pokemon.Types[0] == "ice"?t.Ice:
-                             pokemon.Types[0] == "normal"?t.Normal:
-                             pokemon.Types[0] == "poison"?t.Poison:
-                             pokemon.Types[0] == "psychic"?t.Psychic:
-                             pokemon.Types[0] == "rock"?t.Rock:  
-                             pokemon.Types[0] == "shadow"?t.Shadow:
-                             pokemon.Types[0] == "steel"?t.Steel:
-                             pokemon.Types[0] == "unknown"?t.Unknown:
-                             pokemon.Types[0] == "water"?t.Water:
-                             1
-                             
-                             )
+        var result = _context.Types.Where(t => t.Name == move.Type).FirstOrDefault();
+        float m1 = (float)(result?.GetType().GetProperty(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pokemon.Types[0])).GetValue(result)??1);
 
-                .FirstOrDefault();
+        // float m1 =  _context.Types
+        //         .Where(t => t.Name == move.Type)
+        //         .Select(t => pokemon.Types[0] == "bug"?t.Bug:
+        //                      pokemon.Types[0] == "dark"?t.Dark:
+        //                      pokemon.Types[0] == "dragon"?t.Dragon:
+        //                      pokemon.Types[0] == "electric"?t.Electric:
+        //                      pokemon.Types[0] == "fairy"?t.Fairy:
+        //                      pokemon.Types[0] == "fighting"?t.Fighting:
+        //                      pokemon.Types[0] == "fire"?t.Fire:
+        //                      pokemon.Types[0] == "ghost"?t.Ghost:
+        //                      pokemon.Types[0] == "grass"?t.Grass:
+        //                      pokemon.Types[0] == "ice"?t.Ice:
+        //                      pokemon.Types[0] == "normal"?t.Normal:
+        //                      pokemon.Types[0] == "poison"?t.Poison:
+        //                      pokemon.Types[0] == "psychic"?t.Psychic:
+        //                      pokemon.Types[0] == "rock"?t.Rock:  
+        //                      pokemon.Types[0] == "shadow"?t.Shadow:
+        //                      pokemon.Types[0] == "steel"?t.Steel:
+        //                      pokemon.Types[0] == "unknown"?t.Unknown:
+        //                      pokemon.Types[0] == "water"?t.Water:
+        //                      1
+        //                      )
+        //         .FirstOrDefault();
         float m2 = 1;
         if (pokemon.Types.Count == 2)
         {
-            m2 =  _context.Types
-                .Where(t => t.Name == move.Type)
-                .Select(t => pokemon.Types[1] == "bug"?t.Bug:
-                             pokemon.Types[1] == "dark"?t.Dark:
-                             pokemon.Types[1] == "dragon"?t.Dragon:
-                             pokemon.Types[1] == "electric"?t.Electric:
-                             pokemon.Types[1] == "fairy"?t.Fairy:
-                             pokemon.Types[1] == "fighting"?t.Fighting:
-                             pokemon.Types[1] == "fire"?t.Fire:
-                             pokemon.Types[1] == "ghost"?t.Ghost:
-                             pokemon.Types[1] == "grass"?t.Grass:
-                             pokemon.Types[1] == "ice"?t.Ice:
-                             pokemon.Types[1] == "normal"?t.Normal:
-                             pokemon.Types[1] == "poison"?t.Poison:
-                             pokemon.Types[1] == "psychic"?t.Psychic:
-                             pokemon.Types[1] == "rock"?t.Rock:  
-                             pokemon.Types[1] == "shadow"?t.Shadow:
-                             pokemon.Types[1] == "steel"?t.Steel:
-                             pokemon.Types[1] == "unknown"?t.Unknown:
-                             pokemon.Types[1] == "water"?t.Water:
-                             1
+            var result2 = _context.Types.Where(t => t.Name == move.Type).FirstOrDefault();
+            m2 = (float)(result2?.GetType().GetProperty(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pokemon.Types[1])).GetValue(result2)??1);
+            // m2 =  _context.Types
+            //     .Where(t => t.Name == move.Type)
+            //     .Select(t => pokemon.Types[1] == "bug"?t.Bug:
+            //                  pokemon.Types[1] == "dark"?t.Dark:
+            //                  pokemon.Types[1] == "dragon"?t.Dragon:
+            //                  pokemon.Types[1] == "electric"?t.Electric:
+            //                  pokemon.Types[1] == "fairy"?t.Fairy:
+            //                  pokemon.Types[1] == "fighting"?t.Fighting:
+            //                  pokemon.Types[1] == "fire"?t.Fire:
+            //                  pokemon.Types[1] == "ghost"?t.Ghost:
+            //                  pokemon.Types[1] == "grass"?t.Grass:
+            //                  pokemon.Types[1] == "ice"?t.Ice:
+            //                  pokemon.Types[1] == "normal"?t.Normal:
+            //                  pokemon.Types[1] == "poison"?t.Poison:
+            //                  pokemon.Types[1] == "psychic"?t.Psychic:
+            //                  pokemon.Types[1] == "rock"?t.Rock:  
+            //                  pokemon.Types[1] == "shadow"?t.Shadow:
+            //                  pokemon.Types[1] == "steel"?t.Steel:
+            //                  pokemon.Types[1] == "unknown"?t.Unknown:
+            //                  pokemon.Types[1] == "water"?t.Water:
+            //                  1
                              
-                             ).FirstOrDefault();
+            //                  ).FirstOrDefault();
         }
         return m1 * m2;
         
