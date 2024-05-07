@@ -8,6 +8,7 @@ using System.Globalization;
 
 
 
+
 namespace Service;
 
 public class BattleService:IBattleService
@@ -228,57 +229,60 @@ public class BattleService:IBattleService
 
     public float GetTypeMultiplier(Move move, Pokemon pokemon)
     {
-        float m1 =  _context.Types
-                .Where(t => t.Name == move.Type)
-                .Select(t => pokemon.Types[0] == "bug"?t.Bug:
-                             pokemon.Types[0] == "dark"?t.Dark:
-                             pokemon.Types[0] == "dragon"?t.Dragon:
-                             pokemon.Types[0] == "electric"?t.Electric:
-                             pokemon.Types[0] == "fairy"?t.Fairy:
-                             pokemon.Types[0] == "fighting"?t.Fighting:
-                             pokemon.Types[0] == "fire"?t.Fire:
-                             pokemon.Types[0] == "ghost"?t.Ghost:
-                             pokemon.Types[0] == "grass"?t.Grass:
-                             pokemon.Types[0] == "ice"?t.Ice:
-                             pokemon.Types[0] == "normal"?t.Normal:
-                             pokemon.Types[0] == "poison"?t.Poison:
-                             pokemon.Types[0] == "psychic"?t.Psychic:
-                             pokemon.Types[0] == "rock"?t.Rock:  
-                             pokemon.Types[0] == "shadow"?t.Shadow:
-                             pokemon.Types[0] == "steel"?t.Steel:
-                             pokemon.Types[0] == "unknown"?t.Unknown:
-                             pokemon.Types[0] == "water"?t.Water:
-                             1
-                             
-                             )
+        var result = _context.Types.Where(t => t.Name == move.Type).FirstOrDefault();
+        float m1 = (float)(result?.GetType().GetProperty(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pokemon.Types[0])).GetValue(result)??1);
 
-                .FirstOrDefault();
+        // float m1 =  _context.Types
+        //         .Where(t => t.Name == move.Type)
+        //         .Select(t => pokemon.Types[0] == "bug"?t.Bug:
+        //                      pokemon.Types[0] == "dark"?t.Dark:
+        //                      pokemon.Types[0] == "dragon"?t.Dragon:
+        //                      pokemon.Types[0] == "electric"?t.Electric:
+        //                      pokemon.Types[0] == "fairy"?t.Fairy:
+        //                      pokemon.Types[0] == "fighting"?t.Fighting:
+        //                      pokemon.Types[0] == "fire"?t.Fire:
+        //                      pokemon.Types[0] == "ghost"?t.Ghost:
+        //                      pokemon.Types[0] == "grass"?t.Grass:
+        //                      pokemon.Types[0] == "ice"?t.Ice:
+        //                      pokemon.Types[0] == "normal"?t.Normal:
+        //                      pokemon.Types[0] == "poison"?t.Poison:
+        //                      pokemon.Types[0] == "psychic"?t.Psychic:
+        //                      pokemon.Types[0] == "rock"?t.Rock:  
+        //                      pokemon.Types[0] == "shadow"?t.Shadow:
+        //                      pokemon.Types[0] == "steel"?t.Steel:
+        //                      pokemon.Types[0] == "unknown"?t.Unknown:
+        //                      pokemon.Types[0] == "water"?t.Water:
+        //                      1
+        //                      )
+        //         .FirstOrDefault();
         float m2 = 1;
         if (pokemon.Types.Count == 2)
         {
-            m2 =  _context.Types
-                .Where(t => t.Name == move.Type)
-                .Select(t => pokemon.Types[1] == "bug"?t.Bug:
-                             pokemon.Types[1] == "dark"?t.Dark:
-                             pokemon.Types[1] == "dragon"?t.Dragon:
-                             pokemon.Types[1] == "electric"?t.Electric:
-                             pokemon.Types[1] == "fairy"?t.Fairy:
-                             pokemon.Types[1] == "fighting"?t.Fighting:
-                             pokemon.Types[1] == "fire"?t.Fire:
-                             pokemon.Types[1] == "ghost"?t.Ghost:
-                             pokemon.Types[1] == "grass"?t.Grass:
-                             pokemon.Types[1] == "ice"?t.Ice:
-                             pokemon.Types[1] == "normal"?t.Normal:
-                             pokemon.Types[1] == "poison"?t.Poison:
-                             pokemon.Types[1] == "psychic"?t.Psychic:
-                             pokemon.Types[1] == "rock"?t.Rock:  
-                             pokemon.Types[1] == "shadow"?t.Shadow:
-                             pokemon.Types[1] == "steel"?t.Steel:
-                             pokemon.Types[1] == "unknown"?t.Unknown:
-                             pokemon.Types[1] == "water"?t.Water:
-                             1
+            var result2 = _context.Types.Where(t => t.Name == move.Type).FirstOrDefault();
+            m2 = (float)(result2?.GetType().GetProperty(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pokemon.Types[1])).GetValue(result2)??1);
+            // m2 =  _context.Types
+            //     .Where(t => t.Name == move.Type)
+            //     .Select(t => pokemon.Types[1] == "bug"?t.Bug:
+            //                  pokemon.Types[1] == "dark"?t.Dark:
+            //                  pokemon.Types[1] == "dragon"?t.Dragon:
+            //                  pokemon.Types[1] == "electric"?t.Electric:
+            //                  pokemon.Types[1] == "fairy"?t.Fairy:
+            //                  pokemon.Types[1] == "fighting"?t.Fighting:
+            //                  pokemon.Types[1] == "fire"?t.Fire:
+            //                  pokemon.Types[1] == "ghost"?t.Ghost:
+            //                  pokemon.Types[1] == "grass"?t.Grass:
+            //                  pokemon.Types[1] == "ice"?t.Ice:
+            //                  pokemon.Types[1] == "normal"?t.Normal:
+            //                  pokemon.Types[1] == "poison"?t.Poison:
+            //                  pokemon.Types[1] == "psychic"?t.Psychic:
+            //                  pokemon.Types[1] == "rock"?t.Rock:  
+            //                  pokemon.Types[1] == "shadow"?t.Shadow:
+            //                  pokemon.Types[1] == "steel"?t.Steel:
+            //                  pokemon.Types[1] == "unknown"?t.Unknown:
+            //                  pokemon.Types[1] == "water"?t.Water:
+            //                  1
                              
-                             ).FirstOrDefault();
+            //                  ).FirstOrDefault();
         }
         return m1 * m2;
         
