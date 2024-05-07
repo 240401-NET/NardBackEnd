@@ -116,15 +116,22 @@ public class BattleController : ControllerBase
     [HttpDelete ("deleteBattle/{battleId}")]
     public IActionResult DeleteBattle(int battleId)
     {
+
         _battleService.DeleteBattle(battleId);
         return Ok($"Battle {battleId} removed.");
+        
     }
 
     [HttpGet ("getBattle/{battleId}")]
     public IActionResult GetBattle(int battleId)
     {
         var battle = _battleService.GetBattle(battleId);
-        return Ok(JsonSerializer.Serialize(battle));
+        if (battle!=null)
+        {
+           return Ok(JsonSerializer.Serialize(battle));
+        } else {
+            return BadRequest($"Battle {battleId} does not exist in the database.");
+        }
     }
 
     [HttpGet ("getBattles")]
