@@ -81,21 +81,29 @@ public class BattleController : ControllerBase
         // Get the battle from the database
         Battle battle = _battleService.GetBattle(battleId);
 
-        // Update the battle with the results of using the selected moves as they impact pokemon health.
-        int firstToMove = _battleService.CalculatePriority(battle, pokemon1Move, pokemon2Move);
-        bool move1Hit = _battleService.CalculateHit(battle, pokemon1Move);
-        bool move2Hit = _battleService.CalculateHit(battle, pokemon2Move);
-        Task<string> damageResult = _battleService.CalculateDamage(battle, pokemon1Move, pokemon2Move);
-        string returnInfo = _battleService.UpdateBattle(battle, firstToMove, move1Hit, move2Hit, damageResult);
+        //validate received moves associated with battle and return Bad Request if not
+        if (battle.P1Moves.Contains(pokemon1Move)&&battle.P2Moves.Contains(pokemon2Move))
+        {
+            // Update the battle with the results of using the selected moves as they impact pokemon health.
+            int firstToMove = _battleService.CalculatePriority(battle, pokemon1Move, pokemon2Move);
+            bool move1Hit = _battleService.CalculateHit(battle, pokemon1Move);
+            bool move2Hit = _battleService.CalculateHit(battle, pokemon2Move);
+            Task<string> damageResult = _battleService.CalculateDamage(battle, pokemon1Move, pokemon2Move);
+            string returnInfo = _battleService.UpdateBattle(battle, firstToMove, move1Hit, move2Hit, damageResult);
 
-        return Ok(returnInfo);
+            return Ok((returnInfo));
+
+        } else {
+            return BadRequest("Move not associated with this battle.");
+        }
+
     }
 
     [HttpDelete ("deleteBattle/{battleId}")]
     public IActionResult DeleteBattle(int battleId)
     {
         _battleService.DeleteBattle(battleId);
-        return Ok();
+        return Ok($"Battle {battleId} removed.");
     }
 
     [HttpGet ("getBattle/{battleId}")]

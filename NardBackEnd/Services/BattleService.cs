@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Globalization;
 
 
 
@@ -213,16 +214,8 @@ public class BattleService:IBattleService
 
 
         // Return the result
-        string fullString = $"{p1.Name}\'s {move1.Name} dealt {damage} damage to {p2.Name}. It was {TMultiplier}x\'s effective. {p2.Name} has {p2Stats["hp"]} HP remaining. {p2.Name}\'s {move2.Name} dealt {damage2} damage to {p1.Name}. It was {TMultiplier2}x\'s effective. {p1.Name} has {p1Stats["hp"]} HP remaining.";
-        // create a json object to return who has priority, whether the attack has landed, and the remaining hp of each pokemon
-        // var jsonObject = JsonSerializer.Serialize(new {Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"]});
-        //string fullString = $"move 1 Power is {move1.Power}, attacker attack is {attackerAtk}, defender defense is {defenderDef}, STAB is {STAB}, TMultiplier is {TMultiplier}, rand is {rand}, damage is {damage}, defender HP is {p2Stats["hp"]}, move 2 Power is {move2.Power}, attacker attack is {attackerAtk2}, defender defense is {defenderDef2}, STAB is {STAB2}, TMultiplier is {TMultiplier2}, rand is {rand}, damage is {damage2}, defender HP is {p1Stats["hp"]}";
-        //string fullString = $"attackerAtk over defenderDef is {(attackerAtk/defenderDef)}";
-        // string fullString = $"move1 Type is {move1.Type}, move2 Type is {move2.Type}, TMultiplier is {TMultiplier}, TMultiplier2 is {TMultiplier2}, p1 types are {p1Type1} and {p1Type2}, p2 types are {p2Type1} and {p2Type2}";
-        //string fullString = $"p2 type 1 is {p2.Types[0]}, move1 type is {move1.Type}, p2 Types count is {p2.Types.Count}";
-        //Task<string> result = Task.FromResult(fullString);
-
-        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\": {move1Hit}, \"Move2Hit\": {move2Hit}, \"P1HP\": {p1Stats["hp"]}, \"P2HP\": {p2Stats["hp"]}, \"Summary\": {fullString}}}";
+        string fullString = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} used {move1.Name}. It was {TMultiplier}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} dealt {damage} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)}. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} used {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(move2.Name)}. It was {TMultiplier2}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} dealt {damage2} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)}.";
+        string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\": {move1Hit}, \"Move2Hit\": {move2Hit}, \"P1HP\": {p1Stats["hp"]}, \"P2HP\": {p2Stats["hp"]}, \"Summary\": \"{fullString}\"}}";
         // var jsonObject = JsonSerializer.Serialize(new { Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"] });
         if (jsonObject == null) {
             throw new InvalidOperationException("Failed to serialize the battle results.");
