@@ -203,12 +203,12 @@ public class BattleService:IBattleService
         float rand = new Random().Next(217, 255)/255.0f;
 
         // Calculate the damage
-        float? damage = ((22 * move1.Power * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand;
-        float? damage2 = ((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand;
+        float? damage = move1Hit?((22 * move1.Power * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand:0;
+        float? damage2 = move2Hit?((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand:0;
 
         // Update the defender's HP
-        p1Stats["hp"] -= move2Hit?(int)damage2:0;
-        p2Stats["hp"] -= move1Hit?(int)damage:0;
+        p1Stats["hp"] -= (int)damage2;
+        p2Stats["hp"] -= (int)damage;
 
 
 
