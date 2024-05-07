@@ -207,6 +207,7 @@ public class BattleService:IBattleService
         float? damage = move1Hit?((22 * move1.Power * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand:0;
         float? damage2 = move2Hit?((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand:0;
 
+
         // Update the defender's HP
         p1Stats["hp"] -= (int)damage2;
         p2Stats["hp"] -= (int)damage;
@@ -214,7 +215,7 @@ public class BattleService:IBattleService
 
 
         // Return the result
-        string fullString = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} used {move1.Name}. It was {TMultiplier}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} dealt {damage} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)}. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} used {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(move2.Name)}. It was {TMultiplier2}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} dealt {damage2} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)}.";
+        string fullString = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} used {move1.Name}. It was {TMultiplier}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)} dealt {MathF.Round(damage.Value)} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)}. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} used {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(move2.Name)}. It was {TMultiplier2}x\'s effective. {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p2.Name)} dealt {MathF.Round(damage2.Value)} damage to {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p1.Name)}.";
         string jsonObject = $"{{\"Priority\": {priority}, \"Move1Hit\": {move1Hit}, \"Move2Hit\": {move2Hit}, \"P1HP\": {p1Stats["hp"]}, \"P2HP\": {p2Stats["hp"]}, \"Summary\": \"{fullString}\"}}";
         // var jsonObject = JsonSerializer.Serialize(new { Priority = priority, Move1Hit = move1Hit, Move2Hit = move2Hit, P1HP = p1Stats["hp"], P2HP = p2Stats["hp"] });
         if (jsonObject == null) {
