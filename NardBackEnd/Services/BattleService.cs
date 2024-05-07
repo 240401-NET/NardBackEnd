@@ -63,7 +63,7 @@ public class BattleService:IBattleService
 
     public Battle GetBattle(int battleId)
     {
-        return _context.Battles.Find(battleId);
+        return _context.Battles.Where(b => b.BattleId==battleId).FirstOrDefault();
     }
 
     public List<Battle> GetBattles()
