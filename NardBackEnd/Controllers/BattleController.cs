@@ -99,8 +99,8 @@ public class BattleController : ControllerBase
                 bool move2Hit = _battleService.CalculateHit(battle, pokemon2Move);
                 Task<string> damageResult = _battleService.CalculateDamage(battle, pokemon1Move, pokemon2Move);
                 string returnInfo = _battleService.UpdateBattle(battle, firstToMove, move1Hit, move2Hit, damageResult);
-
-                return Ok((returnInfo));
+                var jsonObject = JsonSerializer.Serialize(returnInfo);
+                return Ok((jsonObject));
                 } else {
                     return BadRequest($"Move {pokemon2Move} not associated with this battle.");
                 }
