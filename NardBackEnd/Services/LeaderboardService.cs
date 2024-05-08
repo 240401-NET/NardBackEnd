@@ -7,9 +7,11 @@ public class LeaderboardService:ILeaderboardService
 {
     private readonly HttpClient _httpClient;
     private readonly ApplicationDbContext _context;
-    public LeaderboardService(HttpClient httpClient, ApplicationDbContext context){
+    private readonly IPokemonService _pokemonService;
+    public LeaderboardService(HttpClient httpClient, ApplicationDbContext context, IPokemonService pokemonService){
         _context = context;
-        _httpClient = httpClient;        
+        _httpClient = httpClient;  
+        _pokemonService = pokemonService;      
     }
 
     public void CreateLeaderboard(Leaderboard leaderboard)
@@ -25,6 +27,25 @@ public class LeaderboardService:ILeaderboardService
         }
         _context.Leaderboards.Add(leaderboard);
         _context.SaveChanges();
+    }
+
+    // In your LeaderboardService
+    public async Task CreateInitialLeaderboard()
+    {
+        var allPokemon = await _pokemonService.GetAllPokemon();
+        foreach (var pokemon in allPokemon)
+        {
+            var leaderboard = new Leaderboard
+            {
+                PokemonId = pokemon.Id,
+                PokemonName = pokemon.Name,
+                Rank = 0,
+                Win = 0,
+                Loss = 0
+            };
+            _context.Leaderboards.Add(leaderboard);
+        }
+        await _context.SaveChangesAsync();
     }
 
     public void UpdateLeaderboard(Leaderboard leaderboard, int winLossPoint)

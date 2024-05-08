@@ -45,6 +45,14 @@ public class LeaderboardController : ControllerBase
         return Ok(leaderboard);
     }
 
+    // In your LeaderboardController
+    [HttpPost("createInitialLeaderboard")]
+    public async Task<ActionResult> CreateInitialLeaderboard()
+    {
+        await _leaderboardService.CreateInitialLeaderboard();
+        return Ok();
+    }
+
     // Delete a leaderboard
     [HttpDelete("{id}")]
     public async Task<ActionResult<Leaderboard>> DeleteLeaderboard(int id)

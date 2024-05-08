@@ -59,6 +59,7 @@ public interface ITypeService
 public interface ILeaderboardService
 {
     void CreateLeaderboard(Leaderboard leaderboard);
+    Task CreateInitialLeaderboard();
     void UpdateLeaderboard(Leaderboard leaderboard, int winLossPoint);
     void DeleteLeaderboard(int leaderboardId);
     Leaderboard GetLeaderboard(int leaderboardId);
