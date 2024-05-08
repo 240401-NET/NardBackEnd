@@ -63,7 +63,7 @@ public class BattleService:IBattleService
 
     public Battle GetBattle(int battleId)
     {
-        return _context.Battles.Find(battleId);
+        return _context.Battles.Where(b => b.BattleId==battleId).FirstOrDefault();
     }
 
     public List<Battle> GetBattles()
@@ -205,8 +205,14 @@ public class BattleService:IBattleService
         float rand = new Random().Next(217, 255)/255.0f;
 
         // Calculate the damage
-        float? damage = move1Hit?((22 * move1.Power * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand:0;
-        float? damage2 = move2Hit?((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand:0;
+        float? damage = 0;
+        float? damage2 = 0;
+        if (move1.Power!=null)
+        {
+        damage = move1Hit?((22 * (move1.Power) * attackerAtk/defenderDef / 50f)+2) * STAB * TMultiplier * rand:0;
+        }
+        if (move2.Power!=null)
+        {damage2 = move2Hit?((22 * move2.Power * attackerAtk/defenderDef / 50f)+2) * STAB2 * TMultiplier2 * rand:0;}
 
 
         // Update the defender's HP
