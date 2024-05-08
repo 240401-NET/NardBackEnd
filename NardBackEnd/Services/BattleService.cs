@@ -230,7 +230,7 @@ public class BattleService:IBattleService
             return " ";
         }
         // Task<string> result = Task.FromResult(jsonObject);
-        return jsonObject;
+        return fullString;
     }
 
     public float GetTypeMultiplier(Move move, Pokemon pokemon)
