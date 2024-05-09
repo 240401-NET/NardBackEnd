@@ -582,7 +582,9 @@ public class ServiceTests
 
         var pokemonService = new PokemonService(httpClient, context, pokemonRepo);
 
-        var service = new BattleService(context, pokemonService, httpClient);
+        var leaderBoardService  = new LeaderboardService(httpClient, context, pokemonService);
+
+        var service = new BattleService(context, pokemonService, httpClient, leaderBoardService);
 
         var battle = new Battle 
                 {
@@ -619,7 +621,8 @@ public class ServiceTests
         var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
         var pokemonRepo = new PokemonRepository(context, apiService);
         var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
-        var service = new BattleService(context, pokemonService, httpClient);
+        var leaderBoardService = new LeaderboardService(httpClient, context, pokemonService);
+        var service = new BattleService(context, pokemonService, httpClient, leaderBoardService);
 
 
         var battle = new Battle 
@@ -669,7 +672,8 @@ public class ServiceTests
         var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
         var pokemonRepo = new PokemonRepository(context, apiService);
         var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
-        var service = new BattleService(context, pokemonService, httpClient);
+        var leaderBoardService = new LeaderboardService(httpClient, context, pokemonService);
+        var service = new BattleService(context, pokemonService, httpClient, leaderBoardService);
 
         var battle = new Battle 
             {
@@ -710,7 +714,8 @@ public class ServiceTests
         var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
         var pokemonRepo = new PokemonRepository(context, apiService);
         var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
-        var service = new BattleService(context, pokemonService, httpClient);
+        var leaderBoardService = new LeaderboardService(httpClient, context, pokemonService);
+        var service = new BattleService(context, pokemonService, httpClient, leaderBoardService);
 
         var move1 = new Move { MoveId = 1, Name = "move1", Priority = 1, Power = 40, Acc = 100, Pp = 35, Type = "normal", DamageClass = "physical"};
         var move2 = new Move { MoveId = 2, Name = "move2", Priority = 2, Power = 40, Acc = 100, Pp = 35, Type = "normal", DamageClass = "physical"};
@@ -757,7 +762,8 @@ public class ServiceTests
         var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
         var pokemonRepo = new PokemonRepository(context, apiService); // Assuming you have a PokemonRepository class
         var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
-        var service = new BattleService(context, pokemonService, httpClient);
+        var leaderBoardService = new LeaderboardService(httpClient, context, pokemonService);
+        var service = new BattleService(context, pokemonService, httpClient, leaderBoardService);
 
         var move1 = new Move { MoveId = 1, Name = "move1", Acc = 100, Power = 40, Type = "normal", DamageClass = "physical"};
         context.Database.EnsureDeleted();
@@ -801,7 +807,8 @@ public class ServiceTests
         var apiService = new PokeAPIService(httpClient); // Assuming you have a PokeAPIService class
         var pokemonRepo = new PokemonRepository(context, apiService); // Assuming you have a PokemonRepository class
         var pokemonService = new PokemonService(httpClient, context, pokemonRepo); // Assuming you have a PokemonService class
-        BattleService service = new BattleService(context, pokemonService, httpClient);
+        var leaderBoardService = new LeaderboardService(httpClient, context, pokemonService);
+        BattleService service = new BattleService(context, pokemonService, httpClient, leaderBoardService);
 
         //mock normal, grass and poison types in context.Types
         var normal = new Models.Type { Id = 1, Name = "normal", Fire = 1, Water = 1, Electric = 1, Grass = 1, Ice = 1, Fighting = 1, Poison = 1, Ground = 1, Flying = 1, Psychic = 1, Bug = 1, Rock = 0.5f, Ghost = 0, Dragon = 1, Dark = 1, Steel = 0.5f, Fairy = 1, Unknown = 1, Shadow = 1 };
@@ -866,7 +873,9 @@ public class ServiceTests
         var pokemonService = new Mock<IPokemonService>();
         var httpClient = new HttpClient();
 
-        var service = new BattleService(context.Object, pokemonService.Object, httpClient);
+        var leaderBoardService = new LeaderboardService(httpClient, context.Object, pokemonService.Object);
+
+        var service = new BattleService(context.Object, pokemonService.Object, httpClient, leaderBoardService);
         var battle = new Battle
         {
             BattleId = 1,
@@ -893,18 +902,34 @@ public class ServiceTests
     public void GetBattle_ReturnsCorrectBattle()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "test").Options;
-        var mockContext = new Mock<ApplicationDbContext>(options);
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: "test")
+            .Options;
+
+        var context = new ApplicationDbContext(options);
         var mockPokemonService = new Mock<IPokemonService>();
         var mockHttpClient = new Mock<HttpClient>();
-        var mockDbSet = new Mock<DbSet<Battle>>();
         var battleId = 1;
-        var expectedBattle = new Battle { BattleId = battleId };
+        var expectedBattle = new Battle 
+        {
+            BattleId = 1,
+            PokemonId1 = 1,
+            P1StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            PokemonId2 = 2,
+            P2StatBlock = new List<string> { "hp:0", "atk:0", "def:0", "satk:0", "sdef:0", "spd:0" },
+            BattleWinner = Battle.Winner.NotFinished,
+            BattleStatus = Battle.Status.InProgress,
+            battlePhase = Battle.BattlePhase.Selection,
+            P1Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" },
+            P2Moves = new List<string> { "tackle", "scratch", "ember", "water-gun" }
+        };
 
-        mockDbSet.Setup(m => m.Find(battleId)).Returns(expectedBattle);
-        mockContext.Setup(m => m.Battles).Returns(mockDbSet.Object);
+        context.Battles.Add(expectedBattle);
+        context.SaveChanges();
 
-        var service = new BattleService(mockContext.Object, mockPokemonService.Object, mockHttpClient.Object);
+        var leaderBoardService = new LeaderboardService(mockHttpClient.Object, context, mockPokemonService.Object);
+
+        var service = new BattleService(context, mockPokemonService.Object, mockHttpClient.Object, leaderBoardService);
 
         // Act
         var result = service.GetBattle(battleId);
@@ -928,7 +953,9 @@ public class ServiceTests
         context.Database.EnsureCreated();
         context.Battles.Add(expectedBattle);
 
-        var service = new BattleService(context, PokemonService, httpClient);
+        var leaderBoardService = new LeaderboardService(httpClient, context, PokemonService);
+
+        var service = new BattleService(context, PokemonService, httpClient, leaderBoardService);
 
         // Act
         var result = service.GetBattles();
@@ -960,7 +987,8 @@ public class ServiceTests
         mockContext.Types.Add(type3);
         mockContext.SaveChanges();
 
-        var service = new BattleService(mockContext,new PokemonService(new HttpClient(), mockContext, new PokemonRepository(mockContext, new PokeAPIService(new HttpClient()))), new HttpClient());
+
+        var service = new BattleService(mockContext, new PokemonService(new HttpClient(), mockContext, new PokemonRepository(mockContext, new PokeAPIService(new HttpClient()))), new HttpClient(), new LeaderboardService(new HttpClient(), mockContext, new PokemonService(new HttpClient(), mockContext, new PokemonRepository(mockContext, new PokeAPIService(new HttpClient())))));
 
         // Act
         var result = service.GetTypeMultiplier(move, pokemon);
@@ -1004,7 +1032,9 @@ public class ServiceTests
 
         var httpClient = new HttpClient();
 
-        var service = new LeaderboardService(httpClient, mockContext);
+        var pokemonService = new PokemonService(httpClient, mockContext, new PokemonRepository(mockContext, new PokeAPIService(httpClient)));
+
+        var service = new LeaderboardService(httpClient, mockContext, pokemonService);
 
         var newLeaderboard = new Leaderboard { PokemonId = 3, PokemonName = "Test Pokemon" };
 
@@ -1025,7 +1055,11 @@ public class ServiceTests
 
         var httpClient = new HttpClient();
 
-        var service = new LeaderboardService(httpClient, context);
+        var pokemonRepo = new PokemonRepository(context, new PokeAPIService(httpClient));
+
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo);
+
+        var service = new LeaderboardService(httpClient, context, pokemonService);
 
         var leaderboard = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon", Win = 5, Loss = 2 };
         context.Leaderboards.Add(leaderboard);
@@ -1065,7 +1099,11 @@ public class ServiceTests
 
     var httpClient = new HttpClient();
 
-    var service = new LeaderboardService(httpClient, context);
+    var pokemonRepo = new PokemonRepository(context, new PokeAPIService(httpClient));
+
+    var pokemonService = new PokemonService(httpClient, context, pokemonRepo);
+
+    var service = new LeaderboardService(httpClient, context, pokemonService);
 
     var leaderboard = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon", Win = 5, Loss = 2 };
     
@@ -1095,7 +1133,11 @@ public class ServiceTests
 
         var httpClient = new HttpClient();
 
-        var service = new LeaderboardService(httpClient, context);
+        var pokemonRepo = new PokemonRepository(context, new PokeAPIService(httpClient));
+
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo);
+
+        var service = new LeaderboardService(httpClient, context, pokemonService);
 
         var leaderboard = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon", Win = 5, Loss = 2 };
         context.Database.EnsureDeleted();
@@ -1121,7 +1163,11 @@ public class ServiceTests
 
         var httpClient = new HttpClient();
 
-        var service = new LeaderboardService(httpClient, context);
+        var pokemonRepo = new PokemonRepository(context, new PokeAPIService(httpClient));
+
+        var pokemonService = new PokemonService(httpClient, context, pokemonRepo);
+
+        var service = new LeaderboardService(httpClient, context, pokemonService);
 
         var leaderboard1 = new Leaderboard { Id = 1, PokemonId = 3, PokemonName = "Test Pokemon 1", Win = 5, Loss = 2, Rank = 2 };
         var leaderboard2 = new Leaderboard { Id = 2, PokemonId = 4, PokemonName = "Test Pokemon 2", Win = 6, Loss = 1, Rank = 1 };
