@@ -16,15 +16,17 @@ public class BattleService:IBattleService
     private readonly HttpClient _httpClient;
     private readonly ApplicationDbContext _context;
     private readonly IPokemonService _pokemonService;
+    private readonly ILeaderboardService _leadService;
     Dictionary<string, int> p1Stats = new Dictionary<string, int>(){ {"hp", 0}, {"atk", 0}, {"def", 0}, {"satk", 0}, {"sdef", 0}, {"spd", 0}};
     Dictionary<string, int> p2Stats = new Dictionary<string, int>(){ {"hp", 0}, {"atk", 0}, {"def", 0}, {"satk", 0}, {"sdef", 0}, {"spd", 0}};
 
 
-    public BattleService(ApplicationDbContext context, IPokemonService pokemonService, HttpClient httpClient)
+    public BattleService(ApplicationDbContext context, IPokemonService pokemonService, HttpClient httpClient, ILeaderboardService leaderBoardService)
     {
         _httpClient = httpClient;
         _context = context;
         _pokemonService = pokemonService;
+        _leadService = leaderBoardService;
     }
 
     public void CreateBattle(Battle battle)
@@ -218,6 +220,21 @@ public class BattleService:IBattleService
         // Update the defender's HP
         p1Stats["hp"] -= (int)damage2;
         p2Stats["hp"] -= (int)damage;
+
+        if (priority==1 && p2Stats["hp"]<1)
+        {
+            Leaderboard board2 = _context.Leaderboards.FirstOrDefault(l => l.PokemonId==p2.Id);
+            Leaderboard board = _context.Leaderboards.FirstOrDefault(l => l.PokemonId==p1.Id);
+            _leadService.UpdateLeaderboard(board2, -1);
+            _leadService.UpdateLeaderboard(board, 1);
+        }
+        if (priority==2 && p1Stats["hp"]<1)
+        {
+            Leaderboard board2 = _context.Leaderboards.FirstOrDefault(l => l.PokemonId==p2.Id);
+            Leaderboard board = _context.Leaderboards.FirstOrDefault(l => l.PokemonId==p1.Id);
+            _leadService.UpdateLeaderboard(board2, 1);
+            _leadService.UpdateLeaderboard(board, -1);
+        }
 
 
 
