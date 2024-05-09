@@ -128,7 +128,7 @@ public class BattleController : ControllerBase
         var battle = _battleService.GetBattle(battleId);
         if (battle!=null)
         {
-           return Ok(JsonSerializer.Serialize(battle));
+           return Ok(battle);
         } else {
             return BadRequest($"Battle {battleId} does not exist in the database.");
         }
